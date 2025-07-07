@@ -1,67 +1,95 @@
-import { ArrowRight, Plus, Calendar, Phone, MessageCircle } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Phone, Tag, Plus, X } from "lucide-react";
 import { useLocation } from "wouter";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertAnnouncementSchema, type InsertAnnouncement } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Navigation from "@/components/navigation";
+import type { Announcement } from "@shared/schema";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 export default function AnnouncementsPage() {
   const [, setLocation] = useLocation();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const categories = ["الكل", "مناسبات", "بيع وشراء", "عقارات", "خدمات"];
-  
-  const announcements = [
-    {
-      id: 1,
-      type: "event",
-      title: "احتفالية اليوم الوطني السوداني",
-      description: "انضموا إلينا للاحتفال باليوم الوطني السوداني في قاعة الفراهيدي",
-      date: "السبت ١٥ يناير ٢٠٢٥",
-      isNew: true,
-    },
-    {
-      id: 2,
-      type: "sale",
-      title: "سيارة للبيع - هونداي النترا ٢٠١٨",
-      description: "سيارة في حالة ممتازة، كيلومترات قليلة، فحص حديث",
-      price: "٤٥٠٠ د.ك",
-      image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
-      postedTime: "منذ ساعتين",
-    },
-    {
-      id: 3,
-      type: "rental",
-      title: "شقة مفروشة للإيجار - حولي",
-      description: "شقة غرفتين وصالة، مفروشة بالكامل، مطبخ مجهز",
-      price: "٣٥٠ د.ك شهرياً",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
-      postedTime: "منذ يوم",
-    },
-    {
-      id: 4,
-      type: "service",
-      title: "خدمات صيانة منزلية",
-      description: "صيانة المنازل والمكاتب، كهرباء وسباكة، خدمة ٢٤ ساعة",
-      price: "أسعار منافسة",
-      postedTime: "منذ ٣ أيام",
-    },
-  ];
+  // Fetch announcements from database
+  const { data: announcements = [], isLoading } = useQuery({
+    queryKey: ['/api/announcements'],
+    queryFn: () => fetch('/api/announcements').then(res => res.json()) as Promise<Announcement[]>
+  });
 
-  const getCategoryBadge = (type: string) => {
-    switch (type) {
-      case "event":
-        return { label: "مناسبة خاصة", color: "bg-gradient-to-r from-sudan-red to-sudan-green text-white" };
-      case "sale":
-        return { label: "بيع", color: "bg-sudan-yellow text-gray-800" };
-      case "rental":
-        return { label: "إيجار", color: "bg-blue-500 text-white" };
-      case "service":
-        return { label: "خدمة", color: "bg-gray-200 text-gray-700" };
-      default:
-        return { label: "عام", color: "bg-gray-200 text-gray-700" };
+  // Form for adding new announcements
+  const form = useForm<InsertAnnouncement>({
+    resolver: zodResolver(insertAnnouncementSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      price: "",
+      phone: "",
+      imageUrl: "",
+      isActive: true
     }
+  });
+
+  // Mutation for adding new announcement
+  const addAnnouncementMutation = useMutation({
+    mutationFn: (data: InsertAnnouncement) => apiRequest('/api/announcements', { method: 'POST', body: JSON.stringify(data) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/announcements'] });
+      setShowAddForm(false);
+      form.reset();
+      toast({
+        title: "تم إضافة الإعلان بنجاح",
+        description: "تم إضافة الإعلان الجديد إلى قائمة الإعلانات",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في إضافة الإعلان",
+        description: "حدث خطأ أثناء إضافة الإعلان. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const onSubmit = (data: InsertAnnouncement) => {
+    addAnnouncementMutation.mutate(data);
   };
 
+  const handleCall = (phone: string) => {
+    window.location.href = `tel:${phone}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header />
+        <div className="max-w-md mx-auto px-4 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-sudan-red border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">جاري تحميل الإعلانات...</p>
+            </div>
+          </div>
+        </div>
+        <Navigation />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-gray-50">
       <Header />
       
       <div className="max-w-md mx-auto px-4 py-6">
@@ -70,115 +98,226 @@ export default function AnnouncementsPage() {
           <div className="flex items-center space-x-3 space-x-reverse">
             <button 
               onClick={() => setLocation("/dashboard")}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"
+              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md"
             >
               <ArrowRight className="h-5 w-5 text-gray-600" />
             </button>
             <div>
               <h2 className="text-xl font-bold text-gray-800">الإعلانات</h2>
-              <p className="text-sm text-gray-600">أحدث المناسبات والإعلانات</p>
+              <p className="text-sm text-gray-600">إعلانات الجالية السودانية</p>
             </div>
           </div>
-          <button className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-bold">
-            <Plus className="h-3 w-3 ml-1" />
-            إضافة إعلان
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className="bg-sudan-black text-white p-3 rounded-full shadow-lg"
+          >
+            <Plus className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Announcement Categories */}
-        <div className="flex space-x-2 space-x-reverse mb-6 overflow-x-auto pb-2">
-          {categories.map((category, index) => (
-            <button
-              key={category}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap font-bold ${
-                index === 0
-                  ? "bg-gray-800 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {category}
-            </button>
+        {/* Announcements List */}
+        <div className="space-y-4">
+          {announcements.map((announcement) => (
+            <div key={announcement.id} className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 space-x-reverse mb-2">
+                    <Tag className="w-4 h-4 text-sudan-blue" />
+                    <span className="text-xs font-bold text-sudan-blue bg-blue-50 px-2 py-1 rounded-full">
+                      {announcement.category}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-lg text-gray-800 mb-2">{announcement.title}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{announcement.description}</p>
+                  
+                  {announcement.price && (
+                    <div className="text-lg font-bold text-sudan-green mb-2">
+                      {announcement.price} د.ك
+                    </div>
+                  )}
+                  
+                  {announcement.phone && (
+                    <div className="flex items-center space-x-2 space-x-reverse mb-3">
+                      <Phone className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm text-gray-600">{announcement.phone}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {announcement.imageUrl && (
+                  <img
+                    src={announcement.imageUrl}
+                    alt={announcement.title}
+                    className="w-20 h-20 rounded-xl object-cover ml-4"
+                  />
+                )}
+              </div>
+              
+              {announcement.phone && (
+                <button 
+                  onClick={() => handleCall(announcement.phone!)}
+                  className="w-full bg-sudan-black text-white py-3 rounded-full font-bold text-sm"
+                >
+                  اتصل الآن
+                </button>
+              )}
+            </div>
           ))}
         </div>
 
-        {/* Announcements Feed */}
-        <div className="space-y-4">
-          {announcements.map((announcement) => {
-            const badge = getCategoryBadge(announcement.type);
-            
-            if (announcement.type === "event") {
-              return (
-                <div key={announcement.id} className="bg-gradient-to-r from-sudan-red to-sudan-green rounded-2xl p-5 text-white">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2 space-x-reverse">
-                      <Calendar className="h-5 w-5" />
-                      <span className="font-bold">مناسبة خاصة</span>
-                    </div>
-                    <span className="bg-white text-sudan-red px-2 py-1 rounded-full text-xs font-bold">جديد</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{announcement.title}</h3>
-                  <p className="text-sm opacity-90 mb-3">{announcement.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <Calendar className="h-4 w-4 inline ml-1" />
-                      {announcement.date}
-                    </div>
-                    <button className="bg-white text-sudan-red px-4 py-2 rounded-full text-sm font-bold">
-                      التفاصيل
-                    </button>
-                  </div>
-                </div>
-              );
-            }
-
-            return (
-              <div 
-                key={announcement.id} 
-                className={`bg-white rounded-2xl p-5 shadow-lg ${
-                  announcement.type === "sale" ? "border-r-4 border-sudan-yellow" : ""
-                }`}
-              >
-                <div className="flex items-start space-x-3 space-x-reverse">
-                  {announcement.image ? (
-                    <img 
-                      src={announcement.image} 
-                      alt={announcement.title}
-                      className="w-16 h-16 rounded-xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-green-50 rounded-xl flex items-center justify-center">
-                      <i className="fas fa-tools text-sudan-green text-2xl"></i>
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-bold text-gray-800">{announcement.title}</h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${badge.color}`}>
-                        {badge.label}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{announcement.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sudan-green font-bold text-lg">{announcement.price}</span>
-                      <div className="text-xs text-gray-500">{announcement.postedTime}</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex space-x-2 space-x-reverse mt-4">
-                  <button className="bg-sudan-red text-white px-4 py-2 rounded-full text-sm font-bold flex-1">
-                    <Phone className="h-3 w-3 ml-1" />
-                    اتصال
-                  </button>
-                  <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-bold">
-                    <MessageCircle className="h-3 w-3 ml-1" />
-                    رسالة
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {announcements.length === 0 && (
+          <div className="text-center py-8">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Tag className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">لا توجد إعلانات متاحة</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              سيتم عرض الإعلانات هنا عند إضافتها
+            </p>
+            <button 
+              onClick={() => setShowAddForm(true)}
+              className="bg-sudan-black text-white px-6 py-3 rounded-full font-bold text-sm"
+            >
+              إضافة إعلان جديد
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Add Announcement Modal */}
+      {showAddForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">إضافة إعلان جديد</h3>
+              <button 
+                onClick={() => setShowAddForm(false)}
+                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>عنوان الإعلان</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مثال: احتفالية اليوم الوطني السوداني" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>تفاصيل الإعلان</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="اكتب تفاصيل الإعلان..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>فئة الإعلان</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر فئة الإعلان" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="مناسبات">مناسبات</SelectItem>
+                          <SelectItem value="بيع وشراء">بيع وشراء</SelectItem>
+                          <SelectItem value="عقارات">عقارات</SelectItem>
+                          <SelectItem value="خدمات">خدمات</SelectItem>
+                          <SelectItem value="تدريب">تدريب</SelectItem>
+                          <SelectItem value="إعلانات">إعلانات عامة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>السعر (اختياري)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مثال: 50.000" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رقم الهاتف (اختياري)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+96599123456" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رابط الصورة (اختياري)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex space-x-3 space-x-reverse pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowAddForm(false)}
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={addAnnouncementMutation.isPending}
+                    className="flex-1 bg-sudan-black hover:bg-gray-800"
+                  >
+                    {addAnnouncementMutation.isPending ? "جاري الإضافة..." : "إضافة الإعلان"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      )}
 
       <Navigation />
     </div>

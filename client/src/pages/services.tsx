@@ -1,12 +1,26 @@
-import { ArrowRight, Utensils, Scissors, Wrench, Car, Phone } from "lucide-react";
+import { ArrowRight, Utensils, Scissors, Wrench, Car, Phone, Plus, X } from "lucide-react";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertServiceSchema, type InsertService } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Navigation from "@/components/navigation";
 import type { Service } from "@shared/schema";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 export default function ServicesPage() {
   const [, setLocation] = useLocation();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const serviceCategories = [
     { name: "مطاعم", count: "١٥ مطعم", icon: Utensils },
@@ -36,6 +50,46 @@ export default function ServicesPage() {
 
   const handleCall = (phone: string) => {
     window.location.href = `tel:${phone}`;
+  };
+
+  // Form for adding new services
+  const form = useForm<InsertService>({
+    resolver: zodResolver(insertServiceSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      category: "",
+      phone: "",
+      address: "",
+      rating: "4.5",
+      imageUrl: "",
+      isActive: true
+    }
+  });
+
+  // Mutation for adding new service
+  const addServiceMutation = useMutation({
+    mutationFn: (data: InsertService) => apiRequest('/api/services', { method: 'POST', body: JSON.stringify(data) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/services'] });
+      setShowAddForm(false);
+      form.reset();
+      toast({
+        title: "تم إضافة الخدمة بنجاح",
+        description: "تم إضافة الخدمة الجديدة إلى دليل الخدمات",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في إضافة الخدمة",
+        description: "حدث خطأ أثناء إضافة الخدمة. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const onSubmit = (data: InsertService) => {
+    addServiceMutation.mutate(data);
   };
 
   if (isLoading) {
@@ -74,6 +128,12 @@ export default function ServicesPage() {
               <p className="text-sm text-gray-600">خدمات الجالية السودانية</p>
             </div>
           </div>
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className="bg-sudan-green text-white p-3 rounded-full shadow-lg"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Service Categories */}
@@ -123,6 +183,140 @@ export default function ServicesPage() {
           ))}
         </div>
       </div>
+
+      {/* Add Service Modal */}
+      {showAddForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">إضافة خدمة جديدة</h3>
+              <button 
+                onClick={() => setShowAddForm(false)}
+                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>اسم الخدمة</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مثال: مطعم الأصالة السوداني" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>وصف الخدمة</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="اكتب وصف مفصل للخدمة..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>فئة الخدمة</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر فئة الخدمة" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="مطاعم">مطاعم</SelectItem>
+                          <SelectItem value="صالونات">صالونات</SelectItem>
+                          <SelectItem value="خدمات قانونية">خدمات قانونية</SelectItem>
+                          <SelectItem value="خدمات تقنية">خدمات تقنية</SelectItem>
+                          <SelectItem value="مواصلات">مواصلات</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رقم الهاتف</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+96599123456" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>العنوان</FormLabel>
+                      <FormControl>
+                        <Input placeholder="السالمية - شارع سالم المبارك" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رابط الصورة (اختياري)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex space-x-3 space-x-reverse pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowAddForm(false)}
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={addServiceMutation.isPending}
+                    className="flex-1 bg-sudan-green hover:bg-green-700"
+                  >
+                    {addServiceMutation.isPending ? "جاري الإضافة..." : "إضافة الخدمة"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      )}
 
       <Navigation />
     </div>
