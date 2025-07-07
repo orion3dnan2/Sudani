@@ -1,7 +1,9 @@
 import { ArrowRight, Utensils, Scissors, Wrench, Car, Phone } from "lucide-react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Navigation from "@/components/navigation";
+import type { Service } from "@shared/schema";
 
 export default function ServicesPage() {
   const [, setLocation] = useLocation();
@@ -13,29 +15,11 @@ export default function ServicesPage() {
     { name: "مواصلات", count: "٦ خدمات", icon: Car },
   ];
 
-  const featuredServices = [
-    {
-      id: 1,
-      name: "مطعم الأصالة السوداني",
-      description: "أطباق سودانية أصيلة",
-      rating: "٤.٨",
-      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
-    },
-    {
-      id: 2,
-      name: "صالون الجمال السوداني",
-      description: "خدمات تجميل متكاملة",
-      rating: "٤.٣",
-      image: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
-    },
-    {
-      id: 3,
-      name: "مكتب الخرطوم للاستشارات",
-      description: "استشارات قانونية ومالية",
-      rating: "٥.٠",
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100",
-    },
-  ];
+  // Fetch services from database
+  const { data: services = [], isLoading } = useQuery({
+    queryKey: ['/api/services'],
+    queryFn: () => fetch('/api/services').then(res => res.json()) as Promise<Service[]>
+  });
 
   const renderStars = (rating: string) => {
     const numRating = parseFloat(rating);
@@ -49,6 +33,27 @@ export default function ServicesPage() {
     }
     return stars;
   };
+
+  const handleCall = (phone: string) => {
+    window.location.href = `tel:${phone}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header />
+        <div className="max-w-md mx-auto px-4 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-sudan-red border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">جاري تحميل الخدمات...</p>
+            </div>
+          </div>
+        </div>
+        <Navigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20">
@@ -89,11 +94,11 @@ export default function ServicesPage() {
 
         {/* Featured Services */}
         <div className="space-y-4">
-          {featuredServices.map((service) => (
+          {services.map((service) => (
             <div key={service.id} className="bg-white rounded-2xl p-4 shadow-lg">
               <div className="flex items-center space-x-4 space-x-reverse">
                 <img 
-                  src={service.image} 
+                  src={service.imageUrl || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100"} 
                   alt={service.name}
                   className="w-16 h-16 rounded-xl object-cover"
                 />
@@ -107,7 +112,10 @@ export default function ServicesPage() {
                     <span className="text-xs text-gray-600 mr-2">{service.rating}</span>
                   </div>
                 </div>
-                <button className="bg-sudan-green text-white p-2 rounded-full">
+                <button 
+                  onClick={() => handleCall(service.phone)}
+                  className="bg-sudan-green text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+                >
                   <Phone className="h-4 w-4" />
                 </button>
               </div>

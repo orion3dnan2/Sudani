@@ -1,14 +1,27 @@
-import { ArrowRight, Search, Plus, ShoppingBasket, MessageCircle, Filter } from "lucide-react";
+import { ArrowRight, Search, Plus, ShoppingBasket, MessageCircle, Filter, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertProductSchema, type InsertProduct } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Navigation from "@/components/navigation";
 import type { Product } from "@shared/schema";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 export default function MarketPage() {
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("الكل");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const categories = [
     { name: "الكل", icon: "🏪", count: 12 },
@@ -34,6 +47,44 @@ export default function MarketPage() {
     const defaultPhone = "+96599123456";
     const whatsappUrl = `https://wa.me/${defaultPhone.replace(/[^0-9]/g, '')}?text=${message}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  // Form for adding new products
+  const form = useForm<InsertProduct>({
+    resolver: zodResolver(insertProductSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      imageUrl: "",
+      isActive: true
+    }
+  });
+
+  // Mutation for adding new product
+  const addProductMutation = useMutation({
+    mutationFn: (data: InsertProduct) => apiRequest('/api/products', { method: 'POST', body: JSON.stringify(data) }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      setShowAddForm(false);
+      form.reset();
+      toast({
+        title: "تم إضافة المنتج بنجاح",
+        description: "تم إضافة المنتج الجديد إلى السوق السوداني",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "خطأ في إضافة المنتج",
+        description: "حدث خطأ أثناء إضافة المنتج. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const onSubmit = (data: InsertProduct) => {
+    addProductMutation.mutate(data);
   };
 
   const renderStars = (rating: number = 4.5) => {
@@ -251,12 +302,135 @@ export default function MarketPage() {
               <ShoppingBasket className="h-5 w-5" />
               <span>السلة (٠)</span>
             </button>
-            <button className="bg-white text-sudan-red p-3 rounded-full shadow-lg border border-sudan-red">
+            <button 
+              onClick={() => setShowAddForm(true)}
+              className="bg-white text-sudan-red p-3 rounded-full shadow-lg border border-sudan-red"
+            >
               <Plus className="h-5 w-5" />
             </button>
           </div>
         )}
       </div>
+
+      {/* Add Product Modal */}
+      {showAddForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800">إضافة منتج جديد</h3>
+              <button 
+                onClick={() => setShowAddForm(false)}
+                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>اسم المنتج</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مثال: توابل سودانية" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>وصف المنتج</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="اكتب وصف مفصل للمنتج..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>السعر (د.ك)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="مثال: 5.500" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>الفئة</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر فئة المنتج" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="أطعمة">أطعمة</SelectItem>
+                          <SelectItem value="توابل">توابل</SelectItem>
+                          <SelectItem value="ملابس">ملابس</SelectItem>
+                          <SelectItem value="أدوات منزلية">أدوات منزلية</SelectItem>
+                          <SelectItem value="عطور">عطور</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رابط الصورة (اختياري)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex space-x-3 space-x-reverse pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowAddForm(false)}
+                    className="flex-1"
+                  >
+                    إلغاء
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={addProductMutation.isPending}
+                    className="flex-1 bg-sudan-red hover:bg-red-700"
+                  >
+                    {addProductMutation.isPending ? "جاري الإضافة..." : "إضافة المنتج"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      )}
 
       <Navigation />
     </div>
