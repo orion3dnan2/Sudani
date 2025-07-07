@@ -111,6 +111,7 @@ The application is designed to be easily deployable to platforms like Replit, wi
 Changelog:
 - July 07, 2025. Initial setup
 - July 07, 2025. Enhanced Market Page with WhatsApp integration, category filtering, and mobile-optimized design
+- July 07, 2025. Added PostgreSQL database integration with full CRUD API endpoints for products, services, jobs, and announcements
 
 ## User Preferences
 

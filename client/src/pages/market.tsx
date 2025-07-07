@@ -1,8 +1,10 @@
 import { ArrowRight, Search, Plus, ShoppingBasket, MessageCircle, Filter } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Navigation from "@/components/navigation";
+import type { Product } from "@shared/schema";
 
 export default function MarketPage() {
   const [, setLocation] = useLocation();
@@ -16,82 +18,25 @@ export default function MarketPage() {
     { name: "أدوات منزلية", icon: "🏠", count: 2 },
   ];
   
-  const allProducts = [
-    {
-      id: 1,
-      name: "توابل سودانية مشكلة",
-      description: "توابل أصيلة من السودان - خليط مميز من الكمون والكزبرة والحلبة",
-      price: "٥ د.ك",
-      category: "توابل",
-      seller: "أم أحمد للتوابل",
-      phone: "+96599123456",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-      isAvailable: true,
-      rating: 4.8,
-    },
-    {
-      id: 2,
-      name: "قهوة سودانية محمصة",
-      description: "قهوة محمصة تقليدياً بالطريقة السودانية الأصيلة",
-      price: "٨ د.ك",
-      category: "أطعمة",
-      seller: "مقهى النيل الأزرق",
-      phone: "+96599234567",
-      image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-      isAvailable: true,
-      rating: 4.9,
-    },
-    {
-      id: 3,
-      name: "جلابية سودانية أصيلة",
-      description: "جلابية تقليدية سودانية مصنوعة من القطن الخالص",
-      price: "١٥ د.ك",
-      category: "ملابس",
-      seller: "بيت الأزياء السودانية",
-      phone: "+96599345678",
-      image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-      isAvailable: true,
-      rating: 4.7,
-    },
-    {
-      id: 4,
-      name: "تمور وحلويات سودانية",
-      description: "تشكيلة مميزة من التمور والحلويات السودانية التقليدية",
-      price: "١٢ د.ك",
-      category: "أطعمة",
-      seller: "حلويات السودان",
-      phone: "+96599456789",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-      isAvailable: true,
-      rating: 4.6,
-    },
-    {
-      id: 5,
-      name: "أواني طبخ تقليدية",
-      description: "أواني طبخ سودانية تقليدية من الفخار والمعدن",
-      price: "٢٠ د.ك",
-      category: "أدوات منزلية",
-      seller: "التراث السوداني",
-      phone: "+96599567890",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-      isAvailable: false,
-      rating: 4.5,
-    },
-  ];
+  // Fetch products from database
+  const { data: allProducts = [], isLoading, error } = useQuery({
+    queryKey: ['/api/products', selectedCategory],
+    queryFn: () => fetch(`/api/products?category=${encodeURIComponent(selectedCategory)}`).then(res => res.json()) as Promise<Product[]>
+  });
 
-  const filteredProducts = selectedCategory === "الكل" 
-    ? allProducts 
-    : allProducts.filter(product => product.category === selectedCategory);
+  const filteredProducts = allProducts;
 
-  const handleWhatsAppOrder = (product: typeof allProducts[0]) => {
+  const handleWhatsAppOrder = (product: Product) => {
     const message = encodeURIComponent(
-      `السلام عليكم\nأريد طلب: ${product.name}\nالسعر: ${product.price}\nمن: ${product.seller}`
+      `السلام عليكم\nأريد طلب: ${product.name}\nالسعر: ${product.price} د.ك\nرقم المنتج: ${product.id}`
     );
-    const whatsappUrl = `https://wa.me/${product.phone.replace(/[^0-9]/g, '')}?text=${message}`;
+    // For demo purposes, using a default number since we don't have seller phone in the product schema
+    const defaultPhone = "+96599123456";
+    const whatsappUrl = `https://wa.me/${defaultPhone.replace(/[^0-9]/g, '')}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number = 4.5) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
@@ -102,6 +47,51 @@ export default function MarketPage() {
     }
     return stars;
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header />
+        <div className="max-w-md mx-auto px-4 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-sudan-red border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">جاري تحميل المنتجات...</p>
+            </div>
+          </div>
+        </div>
+        <Navigation />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen pb-20 bg-gray-50">
+        <Header />
+        <div className="max-w-md mx-auto px-4 py-6">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-lg">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">خطأ في تحميل المنتجات</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              عذراً، حدث خطأ أثناء تحميل المنتجات. يرجى المحاولة مرة أخرى.
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-sudan-red text-white px-6 py-3 rounded-full font-bold text-sm"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        </div>
+        <Navigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50">
@@ -179,7 +169,7 @@ export default function MarketPage() {
                     alt={product.name}
                     className="w-full h-48 object-cover"
                   />
-                  {!product.isAvailable && (
+                  {!product.isActive && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                       <span className="text-white font-bold text-sm">غير متوفر حالياً</span>
                     </div>
@@ -187,9 +177,9 @@ export default function MarketPage() {
                   <div className="absolute top-3 right-3 bg-white rounded-full px-2 py-1 shadow-md">
                     <div className="flex items-center space-x-1 space-x-reverse">
                       <div className="flex">
-                        {renderStars(product.rating)}
+                        {renderStars(4.5)}
                       </div>
-                      <span className="text-xs font-bold text-gray-700">{product.rating}</span>
+                      <span className="text-xs font-bold text-gray-700">4.5</span>
                     </div>
                   </div>
                 </div>
@@ -200,15 +190,15 @@ export default function MarketPage() {
                       <h3 className="font-bold text-lg text-gray-800 mb-1">{product.name}</h3>
                       <p className="text-sm text-gray-600 mb-2">{product.description}</p>
                       <div className="text-xs text-gray-500 mb-3">
-                        البائع: {product.seller}
+                        فئة: {product.category}
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold text-sudan-red">{product.price}</div>
+                    <div className="text-2xl font-bold text-sudan-red">{product.price} د.ك</div>
                     <div className="flex space-x-2 space-x-reverse">
-                      {product.isAvailable ? (
+                      {product.isActive ? (
                         <>
                           <button 
                             onClick={() => handleWhatsAppOrder(product)}
