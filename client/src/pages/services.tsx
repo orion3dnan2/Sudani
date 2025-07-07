@@ -19,21 +19,29 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 export default function ServicesPage() {
   const [, setLocation] = useLocation();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("الكل");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const serviceCategories = [
-    { name: "مطاعم", count: "١٥ مطعم", icon: Utensils },
-    { name: "صالونات", count: "٨ صالون", icon: Scissors },
-    { name: "خدمات تقنية", count: "١٢ شركة", icon: Wrench },
-    { name: "مواصلات", count: "٦ خدمات", icon: Car },
+    { name: "الكل", icon: Utensils, color: "bg-gray-500" },
+    { name: "مطاعم", icon: Utensils, color: "bg-sudan-red" },
+    { name: "صالونات", icon: Scissors, color: "bg-sudan-green" },
+    { name: "خدمات قانونية", icon: Wrench, color: "bg-sudan-yellow" },
+    { name: "خدمات تقنية", icon: Wrench, color: "bg-sudan-blue" },
+    { name: "مواصلات", icon: Car, color: "bg-gray-600" },
   ];
 
   // Fetch services from database
-  const { data: services = [], isLoading } = useQuery({
+  const { data: allServices = [], isLoading } = useQuery({
     queryKey: ['/api/services'],
     queryFn: () => fetch('/api/services').then(res => res.json()) as Promise<Service[]>
   });
+
+  // Filter services based on selected category
+  const filteredServices = selectedCategory === "الكل" 
+    ? allServices 
+    : allServices.filter(service => service.category === selectedCategory);
 
   const renderStars = (rating: string) => {
     const numRating = parseFloat(rating);
@@ -141,20 +149,39 @@ export default function ServicesPage() {
           {serviceCategories.map((category) => {
             const Icon = category.icon;
             return (
-              <div key={category.name} className="bg-white rounded-2xl p-4 shadow-lg text-center">
-                <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Icon className="h-5 w-5 text-sudan-green" />
+              <button 
+                key={category.name} 
+                onClick={() => setSelectedCategory(category.name)}
+                className={`rounded-2xl p-4 shadow-lg text-center transition-all ${
+                  selectedCategory === category.name
+                    ? 'bg-sudan-red text-white'
+                    : 'bg-white text-gray-800 hover:bg-gray-50'
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${
+                  selectedCategory === category.name 
+                    ? 'bg-white bg-opacity-20' 
+                    : category.color || 'bg-green-50'
+                }`}>
+                  <Icon className={`h-5 w-5 ${
+                    selectedCategory === category.name ? 'text-white' : 'text-white'
+                  }`} />
                 </div>
                 <h3 className="font-bold text-sm">{category.name}</h3>
-                <p className="text-xs text-gray-600">{category.count}</p>
-              </div>
+                <p className="text-xs opacity-80">
+                  {category.name === "الكل" 
+                    ? `${allServices.length} خدمة`
+                    : `${allServices.filter(s => s.category === category.name).length} خدمة`
+                  }
+                </p>
+              </button>
             );
           })}
         </div>
 
-        {/* Featured Services */}
+        {/* Filtered Services */}
         <div className="space-y-4">
-          {services.map((service) => (
+          {filteredServices.map((service) => (
             <div key={service.id} className="bg-white rounded-2xl p-4 shadow-lg">
               <div className="flex items-center space-x-4 space-x-reverse">
                 <img 
@@ -181,6 +208,29 @@ export default function ServicesPage() {
               </div>
             </div>
           ))}
+          
+          {filteredServices.length === 0 && (
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Utensils className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                {selectedCategory === "الكل" ? "لا توجد خدمات متاحة" : `لا توجد خدمات في فئة ${selectedCategory}`}
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                {selectedCategory === "الكل" 
+                  ? "سيتم عرض الخدمات هنا عند إضافتها"
+                  : `اختر فئة أخرى أو أضف خدمة جديدة في فئة ${selectedCategory}`
+                }
+              </p>
+              <button 
+                onClick={() => setShowAddForm(true)}
+                className="bg-sudan-green text-white px-6 py-3 rounded-full font-bold text-sm"
+              >
+                إضافة خدمة جديدة
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
