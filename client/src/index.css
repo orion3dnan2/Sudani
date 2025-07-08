@@ -15,7 +15,7 @@
   --card-foreground: hsl(20, 14.3%, 4.1%);
   --border: hsl(20, 5.9%, 90%);
   --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
+  --primary: hsl(195, 100%, 70%);
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(60, 4.8%, 95.9%);
   --secondary-foreground: hsl(24, 9.8%, 10%);
@@ -26,12 +26,12 @@
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
 
-  /* Sudanese flag colors */
-  --sudan-red: hsl(0, 100%, 50%);
-  --sudan-green: hsl(120, 100%, 25%);
-  --sudan-yellow: hsl(51, 100%, 50%);
-  --sudan-black: hsl(0, 0%, 0%);
-  --kuwait-blue: hsl(214, 100%, 40%);
+  /* Light sky blue theme colors */
+  --sudan-red: hsl(195, 100%, 75%);
+  --sudan-green: hsl(195, 100%, 65%);
+  --sudan-yellow: hsl(195, 100%, 85%);
+  --sudan-black: hsl(195, 50%, 25%);
+  --kuwait-blue: hsl(195, 100%, 70%);
 }
 
 .dark {
@@ -45,7 +45,7 @@
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
+  --primary: hsl(195, 100%, 70%);
   --primary-foreground: hsl(211, 100%, 99%);
   --secondary: hsl(240, 3.7%, 15.9%);
   --secondary-foreground: hsl(0, 0%, 98%);
