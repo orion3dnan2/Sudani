@@ -117,6 +117,7 @@ Changelog:
 - July 08, 2025. Updated application name from "سوداني في الكويت" to "البيت السوداني" throughout the application
 - July 08, 2025. Added new "محلات" page with navigation and comprehensive store directory functionality
 - July 08, 2025. Enhanced Services page with specialized sections: "شركات شحن", "شركات سفر وسياحة", "عيادات وأطباء سودانيين"
+- July 08, 2025. Added comprehensive authentication system with user roles (regular users and business owners) including login page and business dashboard
 
 ## User Preferences
 

@@ -31,13 +31,20 @@ export default function WelcomePage() {
         <h1 className="text-4xl md:text-5xl font-bold mb-4">البيت السوداني</h1>
         <p className="text-xl md:text-2xl mb-2 font-latin ltr">Sudanese House</p>
         <p className="text-lg mb-8">جسر التواصل بين الجالية السودانية في دولة الكويت</p>
-        <button 
-          onClick={handleStart}
-          className="bg-white text-sudan-red px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
-        >
-          ابدأ الآن
-          <i className="fas fa-arrow-left mr-2"></i>
-        </button>
+        <div className="space-y-4 w-full max-w-sm">
+          <button 
+            onClick={() => setLocation("/login")}
+            className="w-full bg-white text-sudan-red px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105"
+          >
+            تسجيل الدخول
+          </button>
+          <button 
+            onClick={handleStart}
+            className="w-full border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-sudan-red transition-all duration-300"
+          >
+            الدخول كزائر
+          </button>
+        </div>
       </div>
     </div>
   );
