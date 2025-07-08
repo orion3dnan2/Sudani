@@ -1014,10 +1014,10 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-sudan-red to-sudan-green text-black p-6 shadow-lg">
+      <header className="bg-gradient-to-r from-sky-300 to-sky-200 text-black p-6 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 space-x-reverse">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/40 rounded-full flex items-center justify-center">
               <Shield className="w-6 h-6" />
             </div>
             <div>
