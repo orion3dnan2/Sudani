@@ -20,6 +20,7 @@ export default function MarketPage() {
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("الكل");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -37,15 +38,17 @@ export default function MarketPage() {
     queryFn: () => fetch(`/api/products?category=${encodeURIComponent(selectedCategory)}`).then(res => res.json()) as Promise<Product[]>
   });
 
-  const filteredProducts = allProducts;
+  const filteredProducts = allProducts.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleWhatsAppOrder = (product: Product) => {
     const message = encodeURIComponent(
       `السلام عليكم\nأريد طلب: ${product.name}\nالسعر: ${product.price} د.ك\nرقم المنتج: ${product.id}`
     );
-    // For demo purposes, using a default number since we don't have seller phone in the product schema
-    const defaultPhone = "+96599123456";
-    const whatsappUrl = `https://wa.me/${defaultPhone.replace(/[^0-9]/g, '')}?text=${message}`;
+    const phone = product.whatsappPhone || "+96599123456";
+    const whatsappUrl = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -58,7 +61,7 @@ export default function MarketPage() {
       price: "",
       category: "",
       imageUrl: "",
-      isActive: true
+      whatsappPhone: "",
     }
   });
 
@@ -173,6 +176,20 @@ export default function MarketPage() {
           </div>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="البحث عن منتج..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white rounded-2xl px-12 py-4 text-sm border-2 border-gray-100 focus:border-sudan-red focus:outline-none"
+            />
+          </div>
+        </div>
+
         {/* Categories */}
         <div className="mb-6">
           <div className="flex space-x-3 space-x-reverse overflow-x-auto pb-2">
@@ -216,7 +233,7 @@ export default function MarketPage() {
               <div key={product.id} className="bg-white rounded-2xl overflow-hidden shadow-lg">
                 <div className="relative">
                   <img 
-                    src={product.image} 
+                    src={product.imageUrl || "/api/placeholder/400/200"} 
                     alt={product.name}
                     className="w-full h-48 object-cover"
                   />
@@ -390,6 +407,20 @@ export default function MarketPage() {
                           <SelectItem value="عطور">عطور</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="whatsappPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رقم الواتساب</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+96599123456" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

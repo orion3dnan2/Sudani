@@ -19,14 +19,32 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 export default function AnnouncementsPage() {
   const [, setLocation] = useLocation();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("الكل");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Fetch announcements from database
-  const { data: announcements = [], isLoading } = useQuery({
+  const { data: allAnnouncements = [], isLoading } = useQuery({
     queryKey: ['/api/announcements'],
     queryFn: () => fetch('/api/announcements').then(res => res.json()) as Promise<Announcement[]>
   });
+
+  // Filter announcements based on search and category
+  const filteredAnnouncements = allAnnouncements
+    .filter(ann => selectedCategory === "الكل" || ann.category === selectedCategory)
+    .filter(ann => 
+      ann.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ann.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  const categories = [
+    { name: "الكل", icon: "📢", count: allAnnouncements.length },
+    { name: "مناسبات", icon: "🎉", count: allAnnouncements.filter(a => a.category === "مناسبات").length },
+    { name: "للبيع", icon: "🏷️", count: allAnnouncements.filter(a => a.category === "للبيع").length },
+    { name: "للإيجار", icon: "🏠", count: allAnnouncements.filter(a => a.category === "للإيجار").length },
+    { name: "خدمات", icon: "🔧", count: allAnnouncements.filter(a => a.category === "خدمات").length },
+  ];
 
   // Form for adding new announcements
   const form = useForm<InsertAnnouncement>({
@@ -38,7 +56,7 @@ export default function AnnouncementsPage() {
       price: "",
       phone: "",
       imageUrl: "",
-      isActive: true
+
     }
   });
 
@@ -65,6 +83,11 @@ export default function AnnouncementsPage() {
 
   const onSubmit = (data: InsertAnnouncement) => {
     addAnnouncementMutation.mutate(data);
+  };
+
+  // Handle phone call for announcements with phone numbers
+  const handlePhoneCall = (phoneNumber: string) => {
+    window.location.href = `tel:${phoneNumber}`;
   };
 
   const handleCall = (phone: string) => {

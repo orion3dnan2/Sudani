@@ -20,6 +20,7 @@ export default function ServicesPage() {
   const [, setLocation] = useLocation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("الكل");
+  const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -38,10 +39,18 @@ export default function ServicesPage() {
     queryFn: () => fetch('/api/services').then(res => res.json()) as Promise<Service[]>
   });
 
-  // Filter services based on selected category
-  const filteredServices = selectedCategory === "الكل" 
-    ? allServices 
-    : allServices.filter(service => service.category === selectedCategory);
+  // Filter services based on selected category and search term
+  const filteredServices = allServices
+    .filter(service => selectedCategory === "الكل" || service.category === selectedCategory)
+    .filter(service => 
+      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  // Handle phone call
+  const handlePhoneCall = (phoneNumber: string) => {
+    window.location.href = `tel:${phoneNumber}`;
+  };
 
   const renderStars = (rating: string) => {
     const numRating = parseFloat(rating);
@@ -144,6 +153,19 @@ export default function ServicesPage() {
           </button>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="البحث عن خدمة..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white rounded-2xl px-4 py-3 text-sm border-2 border-gray-100 focus:border-sudan-green focus:outline-none"
+            />
+          </div>
+        </div>
+
         {/* Service Categories */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {serviceCategories.map((category) => {
@@ -200,7 +222,7 @@ export default function ServicesPage() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => handleCall(service.phone)}
+                  onClick={() => handlePhoneCall(service.phone)}
                   className="bg-sudan-green text-white p-2 rounded-full hover:bg-green-600 transition-colors"
                 >
                   <Phone className="h-4 w-4" />

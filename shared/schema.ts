@@ -19,6 +19,7 @@ export const products = pgTable("products", {
   price: decimal("price", { precision: 10, scale: 3 }).notNull(),
   category: text("category").notNull(),
   imageUrl: text("image_url"),
+  whatsappPhone: text("whatsapp_phone"),
   sellerId: integer("seller_id").references(() => users.id),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
@@ -78,6 +79,7 @@ export const insertProductSchema = createInsertSchema(products).pick({
   price: true,
   category: true,
   imageUrl: true,
+  whatsappPhone: true,
 });
 
 export const insertServiceSchema = createInsertSchema(services).pick({

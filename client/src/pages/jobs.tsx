@@ -19,14 +19,33 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 export default function JobsPage() {
   const [, setLocation] = useLocation();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("الكل");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Fetch jobs from database
-  const { data: jobs = [], isLoading } = useQuery({
+  const { data: allJobs = [], isLoading } = useQuery({
     queryKey: ['/api/jobs'],
     queryFn: () => fetch('/api/jobs').then(res => res.json()) as Promise<Job[]>
   });
+
+  // Filter jobs based on search and type
+  const filteredJobs = allJobs
+    .filter(job => selectedType === "الكل" || job.type === selectedType)
+    .filter(job => 
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.company.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+  const jobTypes = [
+    { name: "الكل", count: allJobs.length },
+    { name: "دوام كامل", count: allJobs.filter(j => j.type === "دوام كامل").length },
+    { name: "دوام جزئي", count: allJobs.filter(j => j.type === "دوام جزئي").length },
+    { name: "عن بعد", count: allJobs.filter(j => j.type === "عن بعد").length },
+    { name: "تدريب", count: allJobs.filter(j => j.type === "تدريب").length },
+  ];
 
   // Form for adding new jobs
   const form = useForm<InsertJob>({
@@ -38,7 +57,7 @@ export default function JobsPage() {
       location: "",
       type: "",
       salary: "",
-      isActive: true
+
     }
   });
 
@@ -65,6 +84,22 @@ export default function JobsPage() {
 
   const onSubmit = (data: InsertJob) => {
     addJobMutation.mutate(data);
+  };
+
+  // Handle job application (for demo - could integrate with email or external system)
+  const handleApplyJob = (job: Job) => {
+    toast({
+      title: "تم تسجيل الاهتمام",
+      description: `تم تسجيل اهتمامك بوظيفة ${job.title}. سيتم التواصل معك قريباً.`,
+    });
+  };
+
+  // Handle save job for later
+  const handleSaveJob = (job: Job) => {
+    toast({
+      title: "تم حفظ الوظيفة",
+      description: `تم حفظ وظيفة ${job.title} في قائمة الوظائف المحفوظة.`,
+    });
   };
 
   if (isLoading) {
@@ -111,9 +146,41 @@ export default function JobsPage() {
           </button>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="البحث عن وظيفة..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white rounded-2xl px-4 py-3 text-sm border-2 border-gray-100 focus:border-sudan-yellow focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Job Types Filter */}
+        <div className="mb-6">
+          <div className="flex space-x-2 space-x-reverse overflow-x-auto pb-2">
+            {jobTypes.map((type) => (
+              <button
+                key={type.name}
+                onClick={() => setSelectedType(type.name)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm whitespace-nowrap font-medium transition-all ${
+                  selectedType === type.name
+                    ? "bg-sudan-yellow text-white shadow-lg"
+                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                }`}
+              >
+                {type.name} ({type.count})
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Job Listings */}
         <div className="space-y-4">
-          {jobs.map((job) => (
+          {filteredJobs.map((job) => (
             <div key={job.id} className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -137,14 +204,25 @@ export default function JobsPage() {
                   </div>
                 </div>
               </div>
-              <button className="w-full bg-sudan-yellow text-white py-3 rounded-full font-bold text-sm">
-                التقدم للوظيفة
-              </button>
+              <div className="flex space-x-3 space-x-reverse">
+                <button 
+                  onClick={() => handleApplyJob(job)}
+                  className="flex-1 bg-sudan-yellow text-white py-3 rounded-full font-bold text-sm"
+                >
+                  التقدم للوظيفة
+                </button>
+                <button 
+                  onClick={() => handleSaveJob(job)}
+                  className="px-4 py-3 border-2 border-sudan-yellow text-sudan-yellow rounded-full font-bold text-sm hover:bg-sudan-yellow hover:text-white transition-colors"
+                >
+                  حفظ
+                </button>
+              </div>
             </div>
           ))}
         </div>
 
-        {jobs.length === 0 && (
+        {filteredJobs.length === 0 && (
           <div className="text-center py-8">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <User className="w-8 h-8 text-gray-400" />

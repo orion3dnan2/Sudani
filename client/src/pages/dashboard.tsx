@@ -1,10 +1,33 @@
 import { useLocation } from "wouter";
 import { ShoppingBasket, Building, Briefcase, Megaphone } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Navigation from "@/components/navigation";
+import type { Product, Service, Job, Announcement } from "@shared/schema";
 
 export default function DashboardPage() {
   const [, setLocation] = useLocation();
+
+  // Fetch statistics
+  const { data: products = [] } = useQuery({
+    queryKey: ['/api/products'],
+    queryFn: () => fetch('/api/products').then(res => res.json()) as Promise<Product[]>
+  });
+
+  const { data: services = [] } = useQuery({
+    queryKey: ['/api/services'],
+    queryFn: () => fetch('/api/services').then(res => res.json()) as Promise<Service[]>
+  });
+
+  const { data: jobs = [] } = useQuery({
+    queryKey: ['/api/jobs'],
+    queryFn: () => fetch('/api/jobs').then(res => res.json()) as Promise<Job[]>
+  });
+
+  const { data: announcements = [] } = useQuery({
+    queryKey: ['/api/announcements'],
+    queryFn: () => fetch('/api/announcements').then(res => res.json()) as Promise<Announcement[]>
+  });
 
   const mainSections = [
     {
@@ -77,18 +100,22 @@ export default function DashboardPage() {
         {/* Quick Stats */}
         <div className="bg-white rounded-2xl p-6 shadow-lg">
           <h3 className="font-bold text-gray-800 mb-4">إحصائيات سريعة</h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-sudan-red">١٢٣</div>
+              <div className="text-2xl font-bold text-sudan-red">{products.length}</div>
               <div className="text-xs text-gray-600">منتج متاح</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-sudan-green">٤٥</div>
+              <div className="text-2xl font-bold text-sudan-green">{services.length}</div>
               <div className="text-xs text-gray-600">خدمة مسجلة</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-sudan-yellow">٢٨</div>
+              <div className="text-2xl font-bold text-sudan-yellow">{jobs.length}</div>
               <div className="text-xs text-gray-600">وظيفة جديدة</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-sudan-black">{announcements.length}</div>
+              <div className="text-xs text-gray-600">إعلان</div>
             </div>
           </div>
         </div>
