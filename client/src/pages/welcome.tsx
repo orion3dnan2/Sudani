@@ -23,13 +23,13 @@ export default function WelcomePage() {
         <div className="pulse-logo mb-8">
           <div className="w-32 h-32 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-2xl">
             <div className="text-4xl font-bold">
-              <span className="text-sudan-red">س</span>
-              <span className="text-sudan-green">ك</span>
+              <span className="text-sudan-red">ب</span>
+              <span className="text-sudan-green">س</span>
             </div>
           </div>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">سوداني في الكويت</h1>
-        <p className="text-xl md:text-2xl mb-2 font-latin ltr">Sudanese in Kuwait</p>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">البيت السوداني</h1>
+        <p className="text-xl md:text-2xl mb-2 font-latin ltr">Sudanese House</p>
         <p className="text-lg mb-8">جسر التواصل بين الجالية السودانية في دولة الكويت</p>
         <button 
           onClick={handleStart}

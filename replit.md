@@ -1,8 +1,8 @@
-# Sudanese in Kuwait Community App
+# البيت السوداني - Sudanese House Community App
 
 ## Overview
 
-This is a full-stack web application designed to serve the Sudanese community in Kuwait. The app provides a platform for community members to access markets, services, job listings, and announcements. It features a mobile-first design with Arabic (RTL) support and uses modern web technologies for both frontend and backend development.
+This is a full-stack web application called "البيت السوداني" (Sudanese House) designed to serve the Sudanese community in Kuwait. The app provides a platform for community members to access markets, services, job listings, and announcements. It features a mobile-first design with Arabic (RTL) support and uses modern web technologies for both frontend and backend development.
 
 ## System Architecture
 
@@ -113,6 +113,8 @@ Changelog:
 - July 07, 2025. Enhanced Market Page with WhatsApp integration, category filtering, and mobile-optimized design
 - July 07, 2025. Added PostgreSQL database integration with full CRUD API endpoints for products, services, jobs, and announcements
 - July 07, 2025. Implemented comprehensive "Add Item" functionality for all sections with database-connected forms and real-time updates
+- July 08, 2025. Migrated project from Replit Agent to Replit environment with PostgreSQL database setup
+- July 08, 2025. Updated application name from "سوداني في الكويت" to "البيت السوداني" throughout the application
 
 ## User Preferences
 

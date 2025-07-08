@@ -7,10 +7,10 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 space-x-reverse">
             <div className="w-10 h-10 bg-gradient-to-r from-sudan-red to-sudan-green rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">سك</span>
+              <span className="text-white font-bold text-sm">بس</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">سوداني في الكويت</h1>
+              <h1 className="text-lg font-bold text-gray-800">البيت السوداني</h1>
               <p className="text-xs text-gray-500">جاليتك في خدمتك</p>
             </div>
           </div>
