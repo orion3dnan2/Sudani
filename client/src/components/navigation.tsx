@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store } from "lucide-react";
+import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store, LogOut } from "lucide-react";
 
 export default function Navigation() {
   const [location, setLocation] = useLocation();
@@ -34,6 +34,15 @@ export default function Navigation() {
               </button>
             );
           })}
+          
+          {/* Logout Button */}
+          <button
+            onClick={() => setLocation("/login")}
+            className="flex flex-col items-center py-2 px-3 text-red-500 hover:text-red-600"
+          >
+            <LogOut className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">خروج</span>
+          </button>
         </div>
       </div>
     </nav>

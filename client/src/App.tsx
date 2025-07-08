@@ -7,6 +7,7 @@ import WelcomePage from "@/pages/welcome";
 import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
 import BusinessDashboardPage from "@/pages/business-dashboard";
+import AddProductPage from "@/pages/add-product";
 import MarketPage from "@/pages/market";
 import StoresPage from "@/pages/stores";
 import ServicesPage from "@/pages/services";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/login" component={LoginPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/business-dashboard" component={BusinessDashboardPage} />
+      <Route path="/add-product" component={AddProductPage} />
       <Route path="/market" component={MarketPage} />
       <Route path="/stores" component={StoresPage} />
       <Route path="/services" component={ServicesPage} />

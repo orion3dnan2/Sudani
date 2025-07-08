@@ -183,7 +183,7 @@ export default function BusinessDashboardPage() {
                     <Button
                       onClick={() => setLocation("/add-product")}
                       variant="outline"
-                      className="h-20 flex flex-col items-center justify-center"
+                      className="h-20 flex flex-col items-center justify-center bg-sudan-green/5 border-sudan-green text-sudan-green hover:bg-sudan-green hover:text-white"
                     >
                       <Plus className="w-6 h-6 mb-2" />
                       <span>إضافة منتج</span>
