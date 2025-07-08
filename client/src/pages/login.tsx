@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Eye, EyeOff, User, Briefcase, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Shield, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -9,12 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function LoginPage() {
   const [, setLocation] = useLocation();
   const [showPassword, setShowPassword] = useState(false);
-  const [userType, setUserType] = useState<"user" | "business">("user");
   const [isLogin, setIsLogin] = useState(true);
   
   const [formData, setFormData] = useState({
-    email: "",
-    phone: "",
+    username: "",
     password: "",
     confirmPassword: "",
     businessName: "",
@@ -28,18 +26,24 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if username is "admin" (case insensitive)
+    const isAdmin = formData.username.toLowerCase() === "admin";
+    
     // Mock authentication - replace with real API call
     console.log("تسجيل الدخول:", { 
-      email: formData.email, 
-      userType, 
+      username: formData.username, 
+      isAdmin,
       isLogin 
     });
     
-    // Redirect based on user type
-    if (userType === "business") {
-      setLocation("/business-dashboard");
+    // Redirect based on username
+    if (isAdmin) {
+      // Store admin auth and redirect to admin dashboard
+      localStorage.setItem("adminAuth", "true");
+      setLocation("/admin-dashboard");
     } else {
-      setLocation("/dashboard");
+      // Regular user goes to business dashboard
+      setLocation("/business-dashboard");
     }
   };
 
@@ -51,17 +55,21 @@ export default function LoginPage() {
       return;
     }
     
+    // Check if username is "admin" (case insensitive)
+    const isAdmin = formData.username.toLowerCase() === "admin";
+    
     // Mock signup - replace with real API call
     console.log("إنشاء حساب جديد:", { 
       ...formData, 
-      userType 
+      isAdmin
     });
     
     // Redirect to appropriate dashboard
-    if (userType === "business") {
-      setLocation("/business-dashboard");
+    if (isAdmin) {
+      localStorage.setItem("adminAuth", "true");
+      setLocation("/admin-dashboard");
     } else {
-      setLocation("/dashboard");
+      setLocation("/business-dashboard");
     }
   };
 
@@ -88,58 +96,42 @@ export default function LoginPage() {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* User Type Selection */}
-            <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">نوع المستخدم</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setUserType("user")}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    userType === "user"
-                      ? "border-sudan-green bg-sudan-green/10 text-sudan-green"
-                      : "border-gray-200 bg-gray-50 text-gray-600"
-                  }`}
-                >
-                  <User className="w-6 h-6 mx-auto mb-2" />
-                  <div className="text-sm font-medium">مستخدم عادي</div>
-                  <div className="text-xs opacity-75">زائر - عامة الناس</div>
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setUserType("business")}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    userType === "business"
-                      ? "border-sudan-red bg-sudan-red/10 text-sudan-red"
-                      : "border-gray-200 bg-gray-50 text-gray-600"
-                  }`}
-                >
-                  <Briefcase className="w-6 h-6 mx-auto mb-2" />
-                  <div className="text-sm font-medium">صاحب عمل</div>
-                  <div className="text-xs opacity-75">متجر أو خدمات</div>
-                </button>
+            {/* Information Banner */}
+            <div className="bg-gradient-to-r from-sudan-green/10 to-sudan-red/10 p-4 rounded-xl border border-sudan-green/20">
+              <div className="flex items-center space-x-3 space-x-reverse mb-2">
+                <Shield className="w-5 h-5 text-sudan-green" />
+                <h3 className="text-sm font-semibold text-gray-800">تسجيل الدخول التلقائي</h3>
+              </div>
+              <div className="text-xs text-gray-600 space-y-1">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Shield className="w-3 h-3 text-sudan-red" />
+                  <span>المدير العام: اسم المستخدم "Admin"</span>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Briefcase className="w-3 h-3 text-sudan-green" />
+                  <span>أصحاب الأعمال: أي اسم مستخدم آخر</span>
+                </div>
               </div>
             </div>
 
             <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-4">
-              {/* Email/Phone Input */}
+              {/* Username Input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
-                  البريد الإلكتروني أو رقم الهاتف
+                  اسم المستخدم أو البريد الإلكتروني
                 </label>
                 <Input
                   type="text"
-                  placeholder="example@email.com أو +96599123456"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="أدخل اسم المستخدم أو البريد الإلكتروني"
+                  value={formData.username}
+                  onChange={(e) => handleInputChange("username", e.target.value)}
                   className="text-right"
                   required
                 />
               </div>
 
-              {/* Business Fields for Signup */}
-              {!isLogin && userType === "business" && (
+              {/* Business Fields for Signup (only for non-admin users) */}
+              {!isLogin && formData.username.toLowerCase() !== "admin" && (
                 <>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">اسم المتجر/الشركة</label>
@@ -217,12 +209,19 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className={`w-full py-3 text-white font-medium rounded-lg transition-colors ${
-                  userType === "business"
+                  formData.username.toLowerCase() === "admin"
                     ? "bg-sudan-red hover:bg-red-600"
                     : "bg-sudan-green hover:bg-green-600"
                 }`}
               >
-                {isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+                <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                  {formData.username.toLowerCase() === "admin" ? (
+                    <Shield className="w-4 h-4" />
+                  ) : (
+                    <Briefcase className="w-4 h-4" />
+                  )}
+                  <span>{isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}</span>
+                </div>
               </Button>
             </form>
 

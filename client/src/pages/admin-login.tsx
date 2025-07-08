@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
       
       toast({
         title: "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك في لوحة تحكم المطور",
+        description: "مرحباً بك في لوحة تحكم المدير العام",
       });
       
       setLocation("/admin-dashboard");
