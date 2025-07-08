@@ -49,11 +49,11 @@ export default function Header() {
                 >
                   <RefreshCw className="h-5 w-5 text-blue-600" />
                 </button>
+                <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                  <Bell className="h-5 w-5 text-gray-600" />
+                </button>
               </>
             )}
-            <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-              <Bell className="h-5 w-5 text-gray-600" />
-            </button>
             {mockUser ? (
               <div className="flex items-center space-x-2 space-x-reverse">
                 <UserMenu user={mockUser} />

@@ -57,7 +57,9 @@ export default function UserMenu({ user }: UserMenuProps) {
                 <User className="w-4 h-4" />
               </div>
             )}
-            <span className="font-medium">{isAdmin ? "المدير العام" : user.name}</span>
+            <span className="font-medium">
+              {isAdmin ? "المدير العام" : (user.type === "business" ? `${user.name} - صاحب عمل` : user.name)}
+            </span>
             <ChevronDown className="w-4 h-4" />
           </div>
         </Button>
@@ -95,7 +97,15 @@ export default function UserMenu({ user }: UserMenuProps) {
           <>
             <DropdownMenuItem onClick={() => setLocation("/business-dashboard")}>
               <Store className="ml-2 h-4 w-4" />
-              <span>لوحة تحكم الأعمال</span>
+              <span>لوحة تحكم المتجر</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/store-settings")}>
+              <Settings className="ml-2 h-4 w-4" />
+              <span>إعدادات المتجر</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
+              <User className="ml-2 h-4 w-4" />
+              <span>الرجوع إلى الواجهة العامة</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>

@@ -67,7 +67,7 @@ export default function Navigation() {
               }`}
             >
               <Settings className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">⚙️ لوحة التحكم</span>
+              <span className="text-xs font-medium">⚙️ لوحة تحكم المتجر</span>
             </button>
           )}
           

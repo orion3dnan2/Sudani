@@ -84,7 +84,7 @@ export default function BusinessDashboardPage() {
               <ArrowRight className="h-5 w-5 text-gray-600" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">لوحة تحكم الأعمال</h1>
+              <h1 className="text-2xl font-bold text-gray-800">لوحة تحكم المتجر</h1>
               <p className="text-gray-600">{businessData.name} - {businessData.type}</p>
               <Badge className="bg-green-100 text-green-700 text-xs mt-1">🏢 صاحب عمل - صلاحيات محدودة</Badge>
             </div>
