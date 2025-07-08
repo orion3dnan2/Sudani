@@ -28,7 +28,34 @@ import {
   XCircle,
   AlertCircle,
   Clock,
-  Star
+  Star,
+  Bell,
+  Activity,
+  FileBarChart,
+  UserCheck,
+  Send,
+  Lock,
+  Download,
+  Upload,
+  Monitor,
+  TrendingUp,
+  Calendar,
+  Target,
+  Zap,
+  ShieldCheck,
+  Globe,
+  RefreshCw,
+  History,
+  ChevronRight,
+  ExternalLink,
+  Archive,
+  Ban,
+  Mail,
+  Phone,
+  MapPin,
+  Award,
+  Filter as FilterIcon,
+  SortDesc
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -43,6 +70,17 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [notifications, setNotifications] = useState<any[]>([
+    { id: 1, type: "new_user", message: "مستخدم جديد سجل في التطبيق", time: "منذ 5 دقائق", read: false },
+    { id: 2, type: "new_product", message: "تم إضافة منتج جديد للمراجعة", time: "منذ 15 دقيقة", read: false },
+    { id: 3, type: "new_job", message: "وظيفة جديدة تحتاج موافقة", time: "منذ ساعة", read: true },
+  ]);
+  const [selectedDateRange, setSelectedDateRange] = useState("week");
+  const [moderationItems, setModerationItems] = useState<any[]>([
+    { id: 1, type: "product", title: "مطعم البركة السوداني", status: "pending", submittedBy: "أحمد محمد", date: "2025-01-08" },
+    { id: 2, type: "announcement", title: "شقة للإيجار في السالمية", status: "pending", submittedBy: "فاطمة علي", date: "2025-01-08" },
+    { id: 3, type: "job", title: "مطلوب سائق", status: "pending", submittedBy: "محمد الأمين", date: "2025-01-07" },
+  ]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -385,75 +423,503 @@ export default function AdminDashboardPage() {
     );
   };
 
-  const SystemSettings = () => (
+  // Notifications System
+  const NotificationsPanel = () => (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center space-x-2 space-x-reverse">
+            <Bell className="w-5 h-5 text-blue-600" />
+            <span>الإشعارات الفورية</span>
+          </CardTitle>
+          <Badge variant="destructive">{notifications.filter(n => !n.read).length}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3 max-h-80 overflow-y-auto">
+          {notifications.map((notif) => (
+            <div key={notif.id} className={`p-3 rounded-lg border ${!notif.read ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  {notif.type === 'new_user' && <UserPlus className="w-4 h-4 text-green-600" />}
+                  {notif.type === 'new_product' && <Package className="w-4 h-4 text-blue-600" />}
+                  {notif.type === 'new_job' && <Briefcase className="w-4 h-4 text-purple-600" />}
+                  <p className="text-sm font-medium">{notif.message}</p>
+                </div>
+                <span className="text-xs text-gray-500">{notif.time}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <Button className="w-full mt-4" variant="outline">
+          <Check className="w-4 h-4 ml-2" />
+          تمييز الكل كمقروء
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  // Activity Log
+  const ActivityLog = () => {
+    const activities = [
+      { id: 1, user: "أحمد محمد", action: "إضافة منتج", target: "مطعم البركة", time: "منذ 10 دقائق", type: "create" },
+      { id: 2, user: "فاطمة علي", action: "تعديل إعلان", target: "شقة للإيجار", time: "منذ 30 دقيقة", type: "update" },
+      { id: 3, user: "Admin", action: "حذف وظيفة", target: "مطلوب محاسب", time: "منذ ساعة", type: "delete" },
+      { id: 4, user: "محمد الأمين", action: "تسجيل دخول", target: "النظام", time: "منذ ساعتين", type: "login" },
+    ];
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2 space-x-reverse">
+            <Activity className="w-5 h-5 text-green-600" />
+            <span>سجل النشاطات</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            {activities.map((activity) => (
+              <div key={activity.id} className="flex items-center space-x-3 space-x-reverse p-3 rounded-lg border">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  activity.type === 'create' ? 'bg-green-100 text-green-600' :
+                  activity.type === 'update' ? 'bg-blue-100 text-blue-600' :
+                  activity.type === 'delete' ? 'bg-red-100 text-red-600' :
+                  'bg-gray-100 text-gray-600'
+                }`}>
+                  {activity.type === 'create' && <Plus className="w-4 h-4" />}
+                  {activity.type === 'update' && <Edit className="w-4 h-4" />}
+                  {activity.type === 'delete' && <Trash2 className="w-4 h-4" />}
+                  {activity.type === 'login' && <LogOut className="w-4 h-4" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{activity.user} قام بـ {activity.action}</p>
+                  <p className="text-xs text-gray-600">{activity.target}</p>
+                </div>
+                <span className="text-xs text-gray-500">{activity.time}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Reports Section
+  const ReportsSection = () => (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 space-x-reverse">
-            <Palette className="w-5 h-5 text-purple-600" />
-            <span>إعدادات التصميم</span>
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center space-x-2 space-x-reverse">
+              <FileBarChart className="w-5 h-5 text-purple-600" />
+              <span>التقارير الدورية</span>
+            </CardTitle>
+            <select
+              value={selectedDateRange}
+              onChange={(e) => setSelectedDateRange(e.target.value)}
+              className="px-3 py-1 border rounded text-sm"
+            >
+              <option value="week">هذا الأسبوع</option>
+              <option value="month">هذا الشهر</option>
+              <option value="quarter">هذا الربع</option>
+            </select>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">شعار التطبيق</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <Image className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-600">اضغط لرفع شعار جديد</p>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Eye className="w-5 h-5 text-blue-600" />
+                <span className="text-sm font-medium">الزوار</span>
               </div>
+              <p className="text-2xl font-bold text-blue-600 mt-2">1,247</p>
+              <p className="text-xs text-gray-600">+12% من الأسبوع الماضي</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">الألوان الأساسية</label>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="h-10 bg-red-600 rounded border" title="أحمر سوداني"></div>
-                <div className="h-10 bg-green-600 rounded border" title="أخضر سوداني"></div>
-                <div className="h-10 bg-blue-600 rounded border" title="أزرق سوداني"></div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Target className="w-5 h-5 text-green-600" />
+                <span className="text-sm font-medium">الطلبات</span>
               </div>
+              <p className="text-2xl font-bold text-green-600 mt-2">89</p>
+              <p className="text-xs text-gray-600">+8% من الأسبوع الماضي</p>
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">اسم التطبيق</label>
-            <Input defaultValue="البيت السوداني" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">الوصف</label>
-            <Input defaultValue="منصة الجالية السودانية في الكويت" />
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <TrendingUp className="w-5 h-5 text-orange-600" />
+                <span className="text-sm font-medium">الأكثر مشاهدة</span>
+              </div>
+              <p className="text-sm font-bold text-orange-600 mt-2">مطعم الأصالة</p>
+              <p className="text-xs text-gray-600">245 مشاهدة</p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Users className="w-5 h-5 text-purple-600" />
+                <span className="text-sm font-medium">المستخدمون النشطون</span>
+              </div>
+              <p className="text-2xl font-bold text-purple-600 mt-2">156</p>
+              <p className="text-xs text-gray-600">+5% من الأسبوع الماضي</p>
+            </div>
           </div>
           <Button className="w-full bg-purple-600 hover:bg-purple-700">
-            حفظ الإعدادات
+            <Download className="w-4 h-4 ml-2" />
+            تحميل التقرير المفصل
           </Button>
         </CardContent>
       </Card>
+    </div>
+  );
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 space-x-reverse">
-            <FileText className="w-5 h-5 text-green-600" />
-            <span>إعدادات النصوص</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+  // Moderation System
+  const ModerationSystem = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <UserCheck className="w-5 h-5 text-green-600" />
+          <span>نظام الموافقة</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {moderationItems.map((item) => (
+            <div key={item.id} className="p-4 border rounded-lg bg-yellow-50">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  {item.type === 'product' && <Package className="w-4 h-4 text-blue-600" />}
+                  {item.type === 'announcement' && <MessageSquare className="w-4 h-4 text-orange-600" />}
+                  {item.type === 'job' && <Briefcase className="w-4 h-4 text-purple-600" />}
+                  <h3 className="font-medium">{item.title}</h3>
+                </div>
+                <Badge variant="secondary">في الانتظار</Badge>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                مرسل بواسطة: {item.submittedBy} • {item.date}
+              </p>
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                  <Check className="w-4 h-4 ml-2" />
+                  موافقة
+                </Button>
+                <Button size="sm" variant="destructive">
+                  <X className="w-4 h-4 ml-2" />
+                  رفض
+                </Button>
+                <Button size="sm" variant="outline">
+                  <Edit className="w-4 h-4 ml-2" />
+                  إرجاع للتعديل
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // Advanced Search
+  const AdvancedSearch = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <Search className="w-5 h-5 text-blue-600" />
+          <span>البحث المتقدم</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">رسالة الترحيب</label>
-            <Input defaultValue="أهلاً وسهلاً بك في البيت السوداني" />
+            <label className="block text-sm font-medium mb-2">البحث العام</label>
+            <Input placeholder="اسم، هاتف، منتج..." />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">شروط الاستخدام</label>
-            <textarea 
-              className="w-full p-3 border rounded-lg h-24"
-              defaultValue="شروط الاستخدام للتطبيق..."
-            />
+            <label className="block text-sm font-medium mb-2">التاريخ</label>
+            <Input type="date" />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">معلومات الاتصال</label>
-            <Input defaultValue="للتواصل: info@sudanese-house.com" />
+            <label className="block text-sm font-medium mb-2">النوع</label>
+            <select className="w-full p-2 border rounded">
+              <option value="">جميع الأنواع</option>
+              <option value="products">منتجات</option>
+              <option value="services">خدمات</option>
+              <option value="jobs">وظائف</option>
+              <option value="announcements">إعلانات</option>
+            </select>
           </div>
-          <Button className="w-full bg-green-600 hover:bg-green-700">
-            حفظ النصوص
+        </div>
+        <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
+          <Search className="w-4 h-4 ml-2" />
+          بحث
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  // Custom Notifications Sender
+  const CustomNotificationSender = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <Send className="w-5 h-5 text-green-600" />
+          <span>إرسال تنبيهات مخصصة</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">المستهدفون</label>
+          <select className="w-full p-2 border rounded">
+            <option value="all">جميع المستخدمين</option>
+            <option value="business">أصحاب الأعمال فقط</option>
+            <option value="users">المستخدمين العاديين فقط</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">عنوان التنبيه</label>
+          <Input placeholder="مثال: تحديث مهم" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">نص التنبيه</label>
+          <textarea 
+            className="w-full p-3 border rounded-lg h-20"
+            placeholder="مثال: يرجى تحديث بيانات متجرك..."
+          />
+        </div>
+        <Button className="w-full bg-green-600 hover:bg-green-700">
+          <Send className="w-4 h-4 ml-2" />
+          إرسال التنبيه
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  // User Permissions Management
+  const UserPermissionsManager = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <ShieldCheck className="w-5 h-5 text-red-600" />
+          <span>إدارة صلاحيات المستخدمين</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {[
+            { name: "أحمد محمد", type: "business", status: "active" },
+            { name: "فاطمة علي", type: "user", status: "active" },
+            { name: "محمد الأمين", type: "business", status: "restricted" },
+          ].map((user, index) => (
+            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+              <div>
+                <p className="font-medium">{user.name}</p>
+                <p className="text-sm text-gray-600">
+                  {user.type === 'business' ? 'صاحب عمل' : 'مستخدم عادي'}
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <select className="px-2 py-1 border rounded text-sm">
+                  <option value="user">مستخدم عادي</option>
+                  <option value="business">صاحب عمل</option>
+                  <option value="moderator">مدير فرعي</option>
+                </select>
+                <Button size="sm" variant={user.status === 'active' ? 'destructive' : 'default'}>
+                  {user.status === 'active' ? (
+                    <>
+                      <Ban className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // Backup System
+  const BackupSystem = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <Archive className="w-5 h-5 text-blue-600" />
+          <span>نظام النسخ الاحتياطي</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Button className="h-20 flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700">
+            <Download className="w-6 h-6 mb-2" />
+            <span>تحميل نسخة احتياطية</span>
           </Button>
-        </CardContent>
-      </Card>
+          <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
+            <Upload className="w-6 h-6 mb-2" />
+            <span>استعادة نسخة</span>
+          </Button>
+        </div>
+        <div className="p-3 bg-gray-50 rounded">
+          <p className="text-sm font-medium mb-1">آخر نسخة احتياطية</p>
+          <p className="text-xs text-gray-600">2025-01-08 - 10:30 AM</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // Live User View
+  const LiveUserView = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <Monitor className="w-5 h-5 text-green-600" />
+          <span>عرض مباشر للتطبيق</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center space-y-4">
+          <p className="text-sm text-gray-600">
+            اعرض التطبيق كما يراه المستخدمون العاديون
+          </p>
+          <Button 
+            onClick={() => window.open('/', '_blank')}
+            className="w-full bg-green-600 hover:bg-green-700"
+          >
+            <ExternalLink className="w-4 h-4 ml-2" />
+            عرض التطبيق كزائر
+          </Button>
+          <Button 
+            onClick={() => setLocation('/dashboard')}
+            variant="outline" 
+            className="w-full"
+          >
+            <Globe className="w-4 h-4 ml-2" />
+            عرض لوحة المستخدم
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // Performance Analytics
+  const PerformanceAnalytics = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2 space-x-reverse">
+          <Award className="w-5 h-5 text-yellow-600" />
+          <span>تقييم الأداء العام</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-yellow-50 p-3 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Star className="w-4 h-4 text-yellow-600" />
+                <span className="text-sm font-medium">متوسط التقييم</span>
+              </div>
+              <p className="text-xl font-bold text-yellow-600">4.7</p>
+            </div>
+            <div className="bg-green-50 p-3 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <TrendingUp className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium">الأعلى تقييمًا</span>
+              </div>
+              <p className="text-sm font-bold text-green-600">مطعم الأصالة</p>
+            </div>
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <MessageSquare className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium">التعليقات</span>
+              </div>
+              <p className="text-xl font-bold text-blue-600">342</p>
+            </div>
+          </div>
+          <Button variant="outline" className="w-full">
+            <SortDesc className="w-4 h-4 ml-2" />
+            ترتيب حسب التقييم
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const SystemSettings = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 space-x-reverse">
+              <Palette className="w-5 h-5 text-purple-600" />
+              <span>إعدادات التصميم</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">شعار التطبيق</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <Image className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-600">اضغط لرفع شعار جديد</p>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">الألوان الأساسية</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="h-10 bg-red-600 rounded border" title="أحمر سوداني"></div>
+                  <div className="h-10 bg-green-600 rounded border" title="أخضر سوداني"></div>
+                  <div className="h-10 bg-blue-600 rounded border" title="أزرق سوداني"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">اسم التطبيق</label>
+              <Input defaultValue="البيت السوداني" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">الوصف</label>
+              <Input defaultValue="منصة الجالية السودانية في الكويت" />
+            </div>
+            <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              حفظ الإعدادات
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 space-x-reverse">
+              <FileText className="w-5 h-5 text-green-600" />
+              <span>إعدادات النصوص</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">رسالة الترحيب</label>
+              <Input defaultValue="أهلاً وسهلاً بك في البيت السوداني" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">شروط الاستخدام</label>
+              <textarea 
+                className="w-full p-3 border rounded-lg h-24"
+                defaultValue="شروط الاستخدام للتطبيق..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">معلومات الاتصال</label>
+              <Input defaultValue="للتواصل: info@sudanese-house.com" />
+            </div>
+            <Button className="w-full bg-green-600 hover:bg-green-700">
+              حفظ النصوص
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <BackupSystem />
+        <LiveUserView />
+        <PerformanceAnalytics />
+      </div>
     </div>
   );
 
@@ -525,46 +991,52 @@ export default function AdminDashboardPage() {
 
         {/* Management Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="overview">النظرة العامة</TabsTrigger>
-            <TabsTrigger value="announcements">الإعلانات</TabsTrigger>
-            <TabsTrigger value="jobs">الوظائف</TabsTrigger>
-            <TabsTrigger value="services">الخدمات</TabsTrigger>
-            <TabsTrigger value="products">المنتجات</TabsTrigger>
-            <TabsTrigger value="users">المستخدمين</TabsTrigger>
-            <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-12 text-xs">
+            <TabsTrigger value="overview" className="text-xs">النظرة العامة</TabsTrigger>
+            <TabsTrigger value="notifications" className="text-xs">الإشعارات</TabsTrigger>
+            <TabsTrigger value="activity" className="text-xs">سجل النشاط</TabsTrigger>
+            <TabsTrigger value="reports" className="text-xs">التقارير</TabsTrigger>
+            <TabsTrigger value="moderation" className="text-xs">الموافقة</TabsTrigger>
+            <TabsTrigger value="search" className="text-xs">البحث المتقدم</TabsTrigger>
+            <TabsTrigger value="announcements" className="text-xs">الإعلانات</TabsTrigger>
+            <TabsTrigger value="jobs" className="text-xs">الوظائف</TabsTrigger>
+            <TabsTrigger value="services" className="text-xs">الخدمات</TabsTrigger>
+            <TabsTrigger value="products" className="text-xs">المنتجات</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs">المستخدمين</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs">الإعدادات</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <NotificationsPanel />
+              <ActivityLog />
+              <ModerationSystem />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ManagementTable
-                title="آخر المنتجات"
-                data={products.slice(0, 3)}
-                type="products"
-                icon={Package}
-                color="text-green-600"
-              />
-              <ManagementTable
-                title="آخر الخدمات"
-                data={services.slice(0, 3)}
-                type="services"
-                icon={Briefcase}
-                color="text-blue-600"
-              />
-              <ManagementTable
-                title="آخر الوظائف"
-                data={jobs.slice(0, 3)}
-                type="jobs"
-                icon={Users}
-                color="text-purple-600"
-              />
-              <ManagementTable
-                title="آخر الإعلانات"
-                data={announcements.slice(0, 3)}
-                type="announcements"
-                icon={MessageSquare}
-                color="text-orange-600"
-              />
+              <NotificationsPanel />
+              <CustomNotificationSender />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-6">
+            <ActivityLog />
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-6">
+            <ReportsSection />
+          </TabsContent>
+
+          <TabsContent value="moderation" className="space-y-6">
+            <ModerationSystem />
+          </TabsContent>
+
+          <TabsContent value="search" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AdvancedSearch />
+              <UserPermissionsManager />
             </div>
           </TabsContent>
 
@@ -609,7 +1081,10 @@ export default function AdminDashboardPage() {
           </TabsContent>
 
           <TabsContent value="users" className="space-y-6">
-            <UserManagementTable />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <UserManagementTable />
+              <UserPermissionsManager />
+            </div>
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
