@@ -308,11 +308,11 @@ export default function StoresPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="مواد غذائية">مواد غذائية</SelectItem>
-                          <SelectItem value="ملابس وأزياء">ملابس وأزياء</SelectItem>
-                          <SelectItem value="إلكترونيات">إلكترونيات</SelectItem>
-                          <SelectItem value="مستلزمات منزلية">مستلزمات منزلية</SelectItem>
-                          <SelectItem value="صيدليات">صيدليات</SelectItem>
+                          <SelectItem value="مواد غذائية">🥫 مواد غذائية</SelectItem>
+                          <SelectItem value="ملابس وأزياء">👔 ملابس وأزياء</SelectItem>
+                          <SelectItem value="إلكترونيات">📱 إلكترونيات</SelectItem>
+                          <SelectItem value="مستلزمات منزلية">🏠 مستلزمات منزلية</SelectItem>
+                          <SelectItem value="صيدليات">💊 صيدليات</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

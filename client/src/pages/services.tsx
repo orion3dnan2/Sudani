@@ -217,11 +217,16 @@ export default function ServicesPage() {
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-800">{service.name}</h3>
                   <p className="text-sm text-gray-600">{service.description}</p>
-                  <div className="flex items-center mt-1">
-                    <div className="flex">
-                      {renderStars(service.rating)}
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center">
+                      <div className="flex">
+                        {renderStars(service.rating)}
+                      </div>
+                      <span className="text-xs text-gray-600 mr-2">{service.rating}</span>
                     </div>
-                    <span className="text-xs text-gray-600 mr-2">{service.rating}</span>
+                    <span className="text-xs bg-sudan-green text-white px-2 py-1 rounded-full">
+                      {service.category}
+                    </span>
                   </div>
                 </div>
                 <button 
@@ -316,14 +321,14 @@ export default function ServicesPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="مطاعم">مطاعم</SelectItem>
-                          <SelectItem value="صالونات">صالونات</SelectItem>
-                          <SelectItem value="خدمات قانونية">خدمات قانونية</SelectItem>
-                          <SelectItem value="خدمات تقنية">خدمات تقنية</SelectItem>
-                          <SelectItem value="مواصلات">مواصلات</SelectItem>
-                          <SelectItem value="شركات شحن">شركات شحن</SelectItem>
-                          <SelectItem value="شركات سفر وسياحة">شركات سفر وسياحة</SelectItem>
-                          <SelectItem value="عيادات وأطباء سودانيين">عيادات وأطباء سودانيين</SelectItem>
+                          <SelectItem value="مطاعم">🍽️ مطاعم</SelectItem>
+                          <SelectItem value="صالونات">✂️ صالونات</SelectItem>
+                          <SelectItem value="خدمات قانونية">⚖️ خدمات قانونية</SelectItem>
+                          <SelectItem value="خدمات تقنية">💻 خدمات تقنية</SelectItem>
+                          <SelectItem value="مواصلات">🚗 مواصلات</SelectItem>
+                          <SelectItem value="شركات شحن">🚚 شركات شحن</SelectItem>
+                          <SelectItem value="شركات سفر وسياحة">✈️ شركات سفر وسياحة</SelectItem>
+                          <SelectItem value="عيادات وأطباء سودانيين">🏥 عيادات وأطباء سودانيين</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
