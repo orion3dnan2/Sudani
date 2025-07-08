@@ -947,7 +947,7 @@ export default function AdminDashboardPage() {
               <p className="text-xs text-blue-200">صلاحيات كاملة</p>
             </div>
             <Button
-              onClick={() => setLocation('/')}
+              onClick={() => setLocation('/dashboard')}
               variant="outline"
               className="border-white/30 text-white hover:bg-white/10 flex items-center space-x-2 space-x-reverse"
             >
