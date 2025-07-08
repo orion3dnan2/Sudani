@@ -32,7 +32,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-800 dark:text-white">البيت السوداني</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300">جاليتك في خدمتك 🇸🇩</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">سوداني وخليك قدها 🇸🇩</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">
