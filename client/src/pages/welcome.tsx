@@ -44,6 +44,16 @@ export default function WelcomePage() {
           >
             الدخول كزائر
           </button>
+          
+          {/* Admin Access */}
+          <div className="text-center pt-4">
+            <button
+              onClick={() => setLocation("/admin-login")}
+              className="text-xs text-white/60 hover:text-white transition-colors"
+            >
+              دخول المطور
+            </button>
+          </div>
         </div>
       </div>
     </div>

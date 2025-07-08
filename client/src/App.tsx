@@ -14,6 +14,8 @@ import ServicesPage from "@/pages/services";
 import JobsPage from "@/pages/jobs";
 import AnnouncementsPage from "@/pages/announcements";
 import NotFound from "@/pages/not-found";
+import AdminLogin from "@/pages/admin-login";
+import AdminDashboard from "@/pages/admin-dashboard";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/services" component={ServicesPage} />
       <Route path="/jobs" component={JobsPage} />
       <Route path="/announcements" component={AnnouncementsPage} />
+      <Route path="/admin-login" component={AdminLogin} />
+      <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

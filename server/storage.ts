@@ -31,6 +31,12 @@ export interface IStorage {
   getAnnouncementsByCategory(category: string): Promise<Announcement[]>;
   getAnnouncement(id: number): Promise<Announcement | undefined>;
   createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
+  
+  // Delete methods (admin only)
+  deleteProduct(id: number): Promise<void>;
+  deleteService(id: number): Promise<void>;
+  deleteJob(id: number): Promise<void>;
+  deleteAnnouncement(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -140,6 +146,23 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return announcement;
   }
+
+  // Delete methods (admin only)
+  async deleteProduct(id: number): Promise<void> {
+    await db.delete(products).where(eq(products.id, id));
+  }
+
+  async deleteService(id: number): Promise<void> {
+    await db.delete(services).where(eq(services.id, id));
+  }
+
+  async deleteJob(id: number): Promise<void> {
+    await db.delete(jobs).where(eq(jobs.id, id));
+  }
+
+  async deleteAnnouncement(id: number): Promise<void> {
+    await db.delete(announcements).where(eq(announcements.id, id));
+  }
 }
 
 // In-memory storage for fallback
@@ -240,6 +263,23 @@ class MemoryStorage implements IStorage {
     const announcement = { ...insertAnnouncement, id: this.nextId++ } as Announcement & { id: number };
     this.announcements.push(announcement);
     return announcement;
+  }
+
+  // Delete methods (admin only)
+  async deleteProduct(id: number): Promise<void> {
+    this.products = this.products.filter(p => p.id !== id);
+  }
+
+  async deleteService(id: number): Promise<void> {
+    this.services = this.services.filter(s => s.id !== id);
+  }
+
+  async deleteJob(id: number): Promise<void> {
+    this.jobs = this.jobs.filter(j => j.id !== id);
+  }
+
+  async deleteAnnouncement(id: number): Promise<void> {
+    this.announcements = this.announcements.filter(a => a.id !== id);
   }
 }
 
