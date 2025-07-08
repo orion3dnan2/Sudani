@@ -1,4 +1,4 @@
-import { Bell, User, LogOut, Settings } from "lucide-react";
+import { Bell, User, LogOut, Settings, RefreshCw } from "lucide-react";
 import { useLocation } from "wouter";
 import UserMenu from "./user-menu";
 
@@ -34,13 +34,22 @@ export default function Header() {
           </div>
           <div className="flex items-center space-x-2 space-x-reverse">
             {isAdmin && (
-              <button 
-                onClick={() => setLocation("/admin-dashboard")}
-                className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors"
-                title="العودة إلى لوحة التحكم"
-              >
-                <Settings className="h-5 w-5 text-red-600" />
-              </button>
+              <>
+                <button 
+                  onClick={() => setLocation("/admin-dashboard")}
+                  className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors"
+                  title="العودة إلى لوحة التحكم"
+                >
+                  <Settings className="h-5 w-5 text-red-600" />
+                </button>
+                <button 
+                  onClick={() => setLocation("/dashboard")}
+                  className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors"
+                  title="🔁 العودة إلى واجهة المستخدم"
+                >
+                  <RefreshCw className="h-5 w-5 text-blue-600" />
+                </button>
+              </>
             )}
             <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
               <Bell className="h-5 w-5 text-gray-600" />

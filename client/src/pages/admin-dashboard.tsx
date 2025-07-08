@@ -925,7 +925,91 @@ export default function AdminDashboardPage() {
     </div>
   );
 
+  // Technical Logs Component
+  const TechnicalLogs = () => {
+    const [logType, setLogType] = useState("all");
+    const [logFilter, setLogFilter] = useState("");
+    
+    const mockLogs = [
+      { id: 1, type: "error", message: "Failed to connect to database", timestamp: "2025-01-08 11:30:15", level: "high" },
+      { id: 2, type: "warning", message: "API rate limit approaching", timestamp: "2025-01-08 11:25:10", level: "medium" },
+      { id: 3, type: "info", message: "User login successful", timestamp: "2025-01-08 11:20:05", level: "low" },
+      { id: 4, type: "api", message: "GET /api/products - 200 OK", timestamp: "2025-01-08 11:15:30", level: "low" },
+      { id: 5, type: "error", message: "File upload failed", timestamp: "2025-01-08 11:10:20", level: "high" },
+    ];
 
+    const filteredLogs = mockLogs.filter(log => {
+      const matchesType = logType === "all" || log.type === logType;
+      const matchesFilter = logFilter === "" || log.message.toLowerCase().includes(logFilter.toLowerCase());
+      return matchesType && matchesFilter;
+    });
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2 space-x-reverse">
+            <FileText className="w-5 h-5 text-blue-600" />
+            <span>التقارير التقنية والسجلات</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-4 space-x-reverse mb-4">
+            <div className="flex-1">
+              <Input
+                placeholder="البحث في السجلات..."
+                value={logFilter}
+                onChange={(e) => setLogFilter(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            <select
+              value={logType}
+              onChange={(e) => setLogType(e.target.value)}
+              className="px-3 py-2 border rounded-lg text-sm"
+            >
+              <option value="all">جميع السجلات</option>
+              <option value="error">أخطاء</option>
+              <option value="warning">تحذيرات</option>
+              <option value="info">معلومات</option>
+              <option value="api">API</option>
+            </select>
+          </div>
+          
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {filteredLogs.map((log) => (
+              <div 
+                key={log.id} 
+                className={`p-3 rounded-lg border ${
+                  log.type === 'error' ? 'bg-red-50 border-red-200' :
+                  log.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
+                  log.type === 'info' ? 'bg-blue-50 border-blue-200' :
+                  'bg-gray-50 border-gray-200'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Badge 
+                      variant={log.type === 'error' ? 'destructive' : 'default'}
+                      className={
+                        log.type === 'error' ? 'bg-red-100 text-red-700' :
+                        log.type === 'warning' ? 'bg-yellow-100 text-yellow-700' :
+                        log.type === 'info' ? 'bg-blue-100 text-blue-700' :
+                        'bg-gray-100 text-gray-700'
+                      }
+                    >
+                      {log.type.toUpperCase()}
+                    </Badge>
+                    <span className="text-sm font-medium">{log.message}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">{log.timestamp}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -943,16 +1027,17 @@ export default function AdminDashboardPage() {
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">
             <div className="text-right">
-              <p className="font-medium">المدير العام</p>
-              <p className="text-xs text-blue-200">صلاحيات كاملة</p>
+              <p className="font-medium">أحمد محمد</p>
+              <p className="text-xs text-blue-200">المدير العام – صلاحيات كاملة</p>
+              <Badge className="bg-green-500 text-white text-xs mt-1">✅ المدير العام – تحكم كامل</Badge>
             </div>
             <Button
               onClick={() => setLocation('/dashboard')}
               variant="outline"
               className="border-white/30 text-white hover:bg-white/10 flex items-center space-x-2 space-x-reverse"
             >
-              <Home className="w-4 h-4" />
-              <span>عرض الصفحة الرئيسية</span>
+              <RefreshCw className="w-4 h-4" />
+              <span>🔁 العودة إلى واجهة المستخدم</span>
             </Button>
             <Button
               onClick={handleLogout}
@@ -960,7 +1045,7 @@ export default function AdminDashboardPage() {
               className="border-white/30 text-white hover:bg-white/10"
             >
               <LogOut className="w-4 h-4 ml-2" />
-              خروج
+              تسجيل الخروج
             </Button>
           </div>
         </div>
@@ -999,6 +1084,19 @@ export default function AdminDashboardPage() {
           />
         </div>
 
+        {/* Developer Actions */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <Button
+              onClick={() => setLocation('/add-section')}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Plus className="w-4 h-4 ml-2" />
+              ➕ إضافة قسم / مشروع جديد
+            </Button>
+          </div>
+        </div>
+
         {/* Management Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-12 text-xs">
@@ -1014,6 +1112,7 @@ export default function AdminDashboardPage() {
             <TabsTrigger value="products" className="text-xs">المنتجات</TabsTrigger>
             <TabsTrigger value="users" className="text-xs">المستخدمين</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs">الإعدادات</TabsTrigger>
+            <TabsTrigger value="logs" className="text-xs">التقارير التقنية</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -1099,6 +1198,10 @@ export default function AdminDashboardPage() {
 
           <TabsContent value="settings" className="space-y-6">
             <SystemSettings />
+          </TabsContent>
+
+          <TabsContent value="logs" className="space-y-6">
+            <TechnicalLogs />
           </TabsContent>
         </Tabs>
       </div>
