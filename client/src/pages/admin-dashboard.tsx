@@ -55,7 +55,9 @@ import {
   MapPin,
   Award,
   Filter as FilterIcon,
-  SortDesc
+  SortDesc,
+  Home,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -944,6 +946,14 @@ export default function AdminDashboardPage() {
               <p className="font-medium">المدير العام</p>
               <p className="text-xs text-blue-200">صلاحيات كاملة</p>
             </div>
+            <Button
+              onClick={() => setLocation('/')}
+              variant="outline"
+              className="border-white/30 text-white hover:bg-white/10 flex items-center space-x-2 space-x-reverse"
+            >
+              <Home className="w-4 h-4" />
+              <span>عرض الصفحة الرئيسية</span>
+            </Button>
             <Button
               onClick={handleLogout}
               variant="outline"
