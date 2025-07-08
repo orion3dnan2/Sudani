@@ -1014,7 +1014,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-sudan-red to-sudan-green text-white p-6 shadow-lg">
+      <header className="bg-gradient-to-r from-sudan-red to-sudan-green text-black p-6 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4 space-x-reverse">
             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
@@ -1022,19 +1022,19 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold">لوحة تحكم المطور</h1>
-              <p className="text-blue-200 text-sm">إدارة شاملة للنظام - البيت السوداني</p>
+              <p className="text-black/80 text-sm">إدارة شاملة للنظام - البيت السوداني</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">
             <div className="text-right">
               <p className="font-medium">أحمد محمد</p>
-              <p className="text-xs text-blue-200">المدير العام – صلاحيات كاملة</p>
-              <Badge className="bg-green-500 text-white text-xs mt-1">✅ المدير العام – تحكم كامل</Badge>
+              <p className="text-xs text-black/80">المدير العام – صلاحيات كاملة</p>
+              <Badge className="bg-white text-black text-xs mt-1 border border-black/20">✅ المدير العام – تحكم كامل</Badge>
             </div>
             <Button
               onClick={() => setLocation('/dashboard')}
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 flex items-center space-x-2 space-x-reverse"
+              className="border-black/30 text-black hover:bg-white/20 flex items-center space-x-2 space-x-reverse"
             >
               <RefreshCw className="w-4 h-4" />
               <span>🔁 العودة إلى واجهة المستخدم</span>
@@ -1042,7 +1042,7 @@ export default function AdminDashboardPage() {
             <Button
               onClick={handleLogout}
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
+              className="border-black/30 text-black hover:bg-white/20"
             >
               <LogOut className="w-4 h-4 ml-2" />
               تسجيل الخروج
