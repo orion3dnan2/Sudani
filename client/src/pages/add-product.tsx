@@ -50,7 +50,11 @@ export default function AddProductPage() {
 
   // Add product mutation
   const addProductMutation = useMutation({
-    mutationFn: (data: InsertProduct) => apiRequest('/api/products', { method: 'POST', body: JSON.stringify(data) }),
+    mutationFn: async (data: InsertProduct) => {
+      console.log("Sending product data:", data);
+      const response = await apiRequest('POST', '/api/products', data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       productForm.reset();
@@ -71,15 +75,10 @@ export default function AddProductPage() {
 
   // Add service mutation
   const addServiceMutation = useMutation({
-    mutationFn: (data: InsertService) => {
+    mutationFn: async (data: InsertService) => {
       console.log("Sending service data:", data);
-      return apiRequest('/api/services', { 
-        method: 'POST', 
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await apiRequest('POST', '/api/services', data);
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/services'] });
