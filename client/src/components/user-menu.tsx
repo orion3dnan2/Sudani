@@ -57,7 +57,7 @@ export default function UserMenu({ user }: UserMenuProps) {
                 <User className="w-4 h-4" />
               </div>
             )}
-            <span className="font-medium">{isAdmin ? "أحمد محمد" : user.name}</span>
+            <span className="font-medium">{isAdmin ? "المدير العام" : user.name}</span>
             <ChevronDown className="w-4 h-4" />
           </div>
         </Button>
@@ -65,9 +65,9 @@ export default function UserMenu({ user }: UserMenuProps) {
       
       <DropdownMenuContent align="end" className="w-56">
         <div className="px-3 py-2">
-          <p className="text-sm font-medium">{isAdmin ? "أحمد محمد" : user.name}</p>
+          <p className="text-sm font-medium">{isAdmin ? "المدير العام" : user.name}</p>
           <p className="text-xs text-gray-500">
-            {isAdmin ? "المدير العام – صلاحيات كاملة" : (user.type === "business" ? "صاحب عمل" : "مستخدم عادي")}
+            {isAdmin ? "صلاحيات كاملة" : (user.type === "business" ? "صاحب عمل" : "مستخدم عادي")}
           </p>
         </div>
         
