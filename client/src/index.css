@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&family=Cairo:wght@200..1000&family=Inter:wght@100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -61,7 +63,7 @@
   }
 
   body {
-    @apply font-arabic antialiased bg-gray-50 text-foreground;
+    @apply font-arabic antialiased bg-gray-50 dark:bg-gray-900 text-foreground transition-colors duration-300;
     direction: rtl;
   }
 
@@ -72,7 +74,7 @@
 
 @layer utilities {
   .font-arabic {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Tajawal', 'Cairo', sans-serif;
   }
   
   .font-latin {

@@ -1,5 +1,12 @@
 import { useLocation } from "wouter";
-import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store, LogOut, Settings } from "lucide-react";
+import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store, LogOut, Settings, User, Eye } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navigation() {
   const [location, setLocation] = useLocation();
@@ -24,10 +31,10 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-2 transition-colors duration-300">
       <div className="max-w-md mx-auto">
         <div className="flex justify-around">
-          {navItems.map((item) => {
+          {navItems.slice(0, 4).map((item) => {
             const Icon = item.icon;
             const isActive = location === item.path;
             
@@ -35,50 +42,83 @@ export default function Navigation() {
               <button
                 key={item.path}
                 onClick={() => setLocation(item.path)}
-                className={`flex flex-col items-center py-2 px-3 ${
-                  isActive ? "text-sudan-red" : "text-gray-600"
+                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+                  isActive ? "text-sudan-red bg-red-50 dark:bg-red-900/20" : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
-                <Icon className="h-5 w-5 mb-1" />
+                <Icon className="h-6 w-6 mb-1" />
                 <span className="text-xs font-medium">{item.label}</span>
               </button>
             );
           })}
 
-          {/* Admin Dashboard Button - Only for admins (developers) */}
-          {isAdmin && (
-            <button
-              onClick={() => setLocation("/admin-dashboard")}
-              className={`flex flex-col items-center py-2 px-3 ${
-                location === "/admin-dashboard" ? "text-sudan-red" : "text-gray-600"
-              }`}
-            >
-              <Settings className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">لوحة تحكم المطور</span>
-            </button>
-          )}
 
-          {/* Business Dashboard Button - Only for business owners (not admins) */}
-          {mockUser.type === "business" && !isAdmin && (
-            <button
-              onClick={() => setLocation("/business-dashboard")}
-              className={`flex flex-col items-center py-2 px-3 ${
-                location === "/business-dashboard" ? "text-sudan-red" : "text-gray-600"
-              }`}
-            >
-              <Settings className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">⚙️ لوحة تحكم المتجر</span>
-            </button>
-          )}
-          
-          {/* Logout Button */}
-          <button
-            onClick={() => setLocation("/login")}
-            className="flex flex-col items-center py-2 px-3 text-red-500 hover:text-red-600"
-          >
-            <LogOut className="h-5 w-5 mb-1" />
-            <span className="text-xs font-medium">خروج</span>
-          </button>
+
+          {/* User Menu Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+                location === "/admin-dashboard" || location === "/business-dashboard" || location === "/jobs" || location === "/announcements"
+                  ? "text-sudan-red bg-red-50 dark:bg-red-900/20" 
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}>
+                <User className="h-6 w-6 mb-1" />
+                <span className="text-xs font-medium">الحساب</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" sideOffset={8} className="w-56">
+              {/* Jobs and Announcements moved here */}
+              <DropdownMenuItem onClick={() => setLocation("/jobs")}>
+                <Briefcase className="ml-2 h-4 w-4" />
+                <span>الوظائف</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLocation("/announcements")}>
+                <Megaphone className="ml-2 h-4 w-4" />
+                <span>الإعلانات</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator />
+              
+              {/* Admin Dashboard - Only for admins */}
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => setLocation("/admin-dashboard")}>
+                    <Settings className="ml-2 h-4 w-4" />
+                    <span>لوحة تحكم المطور</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+
+              {/* Business Dashboard - Only for business owners */}
+              {mockUser.type === "business" && !isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => setLocation("/business-dashboard")}>
+                    <Settings className="ml-2 h-4 w-4" />
+                    <span>لوحة تحكم المتجر</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocation("/store-settings")}>
+                    <Settings className="ml-2 h-4 w-4" />
+                    <span>إعدادات المتجر</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.open('/stores', '_blank')}>
+                    <Eye className="ml-2 h-4 w-4" />
+                    <span>معاينة متجري كما يراه الزبون</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              
+              {/* Logout */}
+              <DropdownMenuItem 
+                onClick={() => setLocation("/login")} 
+                className="text-red-600 dark:text-red-400"
+              >
+                <LogOut className="ml-2 h-4 w-4" />
+                <span>تسجيل الخروج</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </nav>

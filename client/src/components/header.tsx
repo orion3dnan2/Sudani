@@ -1,9 +1,12 @@
-import { Bell, User, LogOut, Settings, RefreshCw } from "lucide-react";
+import { Bell, User, LogOut, Settings, RefreshCw, Moon, Sun } from "lucide-react";
 import { useLocation } from "wouter";
 import UserMenu from "./user-menu";
+import { useTheme } from "@/hooks/use-theme";
+import { Button } from "@/components/ui/button";
 
 export default function Header() {
   const [, setLocation] = useLocation();
+  const { theme, toggleTheme } = useTheme();
   
   // Check if current user is admin
   const isAdmin = localStorage.getItem("adminAuth") === "true";
@@ -20,58 +23,77 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 py-4">
+    <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 space-x-reverse">
-            <div className="w-10 h-10 bg-gradient-to-r from-sudan-red to-sudan-green rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">بس</span>
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <div className="w-12 h-12 bg-gradient-to-r from-sudan-red to-sudan-green rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">🏠</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">البيت السوداني</h1>
-              <p className="text-xs text-gray-500">جاليتك في خدمتك</p>
+              <h1 className="text-xl font-bold text-gray-800 dark:text-white">البيت السوداني</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-300">جاليتك في خدمتك 🇸🇩</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2 space-x-reverse">
+          <div className="flex items-center space-x-3 space-x-reverse">
+            {/* Theme Toggle Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              title={theme === "light" ? "تبديل للوضع الليلي" : "تبديل للوضع النهاري"}
+            >
+              {theme === "light" ? (
+                <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              ) : (
+                <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              )}
+            </Button>
+
             {isAdmin && (
               <>
-                <button 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setLocation("/admin-dashboard")}
-                  className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors"
+                  className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800"
                   title="العودة إلى لوحة التحكم"
                 >
-                  <Settings className="h-5 w-5 text-red-600" />
-                </button>
-                <button 
+                  <Settings className="h-5 w-5 text-red-600 dark:text-red-400" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setLocation("/dashboard")}
-                  className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors"
-                  title="🔁 العودة إلى واجهة المستخدم"
+                  className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
+                  title="العودة إلى واجهة المستخدم"
                 >
-                  <RefreshCw className="h-5 w-5 text-blue-600" />
-                </button>
-                <button className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                  <Bell className="h-5 w-5 text-gray-600" />
-                </button>
+                  <RefreshCw className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  title="الإشعارات"
+                >
+                  <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                </Button>
               </>
             )}
+            
             {mockUser ? (
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <UserMenu user={mockUser} />
-                <button 
-                  onClick={handleLogout}
-                  className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center hover:bg-red-200 transition-colors"
-                  title="تسجيل الخروج"
-                >
-                  <LogOut className="h-4 w-4 text-red-600" />
-                </button>
-              </div>
+              <UserMenu user={mockUser} />
             ) : (
-              <button 
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setLocation("/login")}
-                className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                title="تسجيل الدخول"
               >
-                <User className="h-5 w-5 text-gray-600" />
-              </button>
+                <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              </Button>
             )}
           </div>
         </div>

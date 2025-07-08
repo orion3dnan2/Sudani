@@ -54,12 +54,12 @@ export default function BusinessDashboardPage() {
   };
 
   const StatCard = ({ title, value, icon: Icon, color }: any) => (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600">{title}</p>
-            <p className="text-2xl font-bold text-gray-800">{value}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{title}</p>
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">{value}</p>
           </div>
           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${color}`}>
             <Icon className="w-6 h-6 text-white" />
@@ -70,7 +70,7 @@ export default function BusinessDashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
       
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -79,14 +79,14 @@ export default function BusinessDashboardPage() {
           <div className="flex items-center space-x-4 space-x-reverse">
             <button 
               onClick={() => setLocation("/dashboard")}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+              className="w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border dark:border-gray-600"
             >
-              <ArrowRight className="h-5 w-5 text-gray-600" />
+              <ArrowRight className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">لوحة تحكم المتجر</h1>
-              <p className="text-gray-600">{businessData.name} - {businessData.type}</p>
-              <Badge className="bg-green-100 text-green-700 text-xs mt-1">🏢 صاحب عمل - صلاحيات محدودة</Badge>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">لوحة تحكم المتجر</h1>
+              <p className="text-gray-600 dark:text-gray-300">{businessData.name} - {businessData.type}</p>
+              <Badge className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs mt-1">🏢 صاحب عمل - صلاحيات محدودة</Badge>
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">

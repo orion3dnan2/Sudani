@@ -68,8 +68,8 @@ export default function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuContent align="end" className="w-56">
         <div className="px-3 py-2">
           <p className="text-sm font-medium">{isAdmin ? "أحمد محمد" : user.name}</p>
-          <p className="text-xs text-gray-500">
-            {isAdmin ? "المدير العام – صلاحيات كاملة" : (user.type === "business" ? "صاحب عمل" : "مستخدم عادي")}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {isAdmin ? "المدير العام – صلاحيات كاملة 👨‍💼" : (user.type === "business" ? "صاحب عمل 💼" : "مستخدم عادي 👤")}
           </p>
         </div>
         
@@ -78,15 +78,15 @@ export default function UserMenu({ user }: UserMenuProps) {
         {isAdmin && (
           <>
             <DropdownMenuItem onClick={() => setLocation("/admin-dashboard")}>
-              <Shield className="ml-2 h-4 w-4" />
+              <Shield className="ml-2 h-4 w-4 text-red-600 dark:text-red-400" />
               <span>لوحة تحكم المطوّر</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/settings")}>
-              <Settings className="ml-2 h-4 w-4" />
+              <Settings className="ml-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>إعدادات النظام</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
-              <User className="ml-2 h-4 w-4" />
+              <User className="ml-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
               <span>الرجوع إلى الواجهة العامة</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -96,15 +96,15 @@ export default function UserMenu({ user }: UserMenuProps) {
         {user.type === "business" && !isAdmin && (
           <>
             <DropdownMenuItem onClick={() => setLocation("/business-dashboard")}>
-              <Store className="ml-2 h-4 w-4" />
+              <Store className="ml-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
               <span>لوحة تحكم المتجر</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/store-settings")}>
-              <Settings className="ml-2 h-4 w-4" />
+              <Settings className="ml-2 h-4 w-4 text-green-600 dark:text-green-400" />
               <span>إعدادات المتجر</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
-              <User className="ml-2 h-4 w-4" />
+              <User className="ml-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>الرجوع إلى الواجهة العامة</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -114,14 +114,14 @@ export default function UserMenu({ user }: UserMenuProps) {
         {!isAdmin && (
           <>
             <DropdownMenuItem>
-              <Settings className="ml-2 h-4 w-4" />
+              <Settings className="ml-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>الإعدادات</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
         
-        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+        <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400">
           <LogOut className="ml-2 h-4 w-4" />
           <span>تسجيل الخروج</span>
         </DropdownMenuItem>
