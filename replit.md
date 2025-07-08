@@ -115,6 +115,8 @@ Changelog:
 - July 07, 2025. Implemented comprehensive "Add Item" functionality for all sections with database-connected forms and real-time updates
 - July 08, 2025. Migrated project from Replit Agent to Replit environment with PostgreSQL database setup
 - July 08, 2025. Updated application name from "سوداني في الكويت" to "البيت السوداني" throughout the application
+- July 08, 2025. Added new "محلات" page with navigation and comprehensive store directory functionality
+- July 08, 2025. Enhanced Services page with specialized sections: "شركات شحن", "شركات سفر وسياحة", "عيادات وأطباء سودانيين"
 
 ## User Preferences
 

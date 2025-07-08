@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Home, ShoppingBasket, Building, Briefcase, Megaphone } from "lucide-react";
+import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store } from "lucide-react";
 
 export default function Navigation() {
   const [location, setLocation] = useLocation();
@@ -7,6 +7,7 @@ export default function Navigation() {
   const navItems = [
     { path: "/dashboard", icon: Home, label: "الرئيسية" },
     { path: "/market", icon: ShoppingBasket, label: "السوق" },
+    { path: "/stores", icon: Store, label: "محلات" },
     { path: "/services", icon: Building, label: "الخدمات" },
     { path: "/jobs", icon: Briefcase, label: "الوظائف" },
     { path: "/announcements", icon: Megaphone, label: "الإعلانات" },
