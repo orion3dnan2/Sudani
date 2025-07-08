@@ -14,17 +14,35 @@ import {
   LogOut,
   Eye,
   BarChart3,
-  Database
+  Database,
+  Check,
+  X,
+  UserPlus,
+  Crown,
+  Palette,
+  FileText,
+  Image,
+  Search,
+  Filter,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Clock,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function AdminDashboardPage() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -97,10 +115,51 @@ export default function AdminDashboardPage() {
     }
   });
 
+  // Approval/Rejection mutations for announcements
+  const approveAnnouncementMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('PATCH', `/api/announcements/${id}/approve`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/announcements'] });
+      toast({ title: "تم قبول الإعلان بنجاح" });
+    }
+  });
+
+  const rejectAnnouncementMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('PATCH', `/api/announcements/${id}/reject`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/announcements'] });
+      toast({ title: "تم رفض الإعلان" });
+    }
+  });
+
   const handleLogout = () => {
     localStorage.removeItem("adminAuth");
     localStorage.removeItem("userType");
     setLocation("/admin-login");
+  };
+
+  // Filter functions
+  const filteredData = (data: any[], type: string) => {
+    if (!data) return [];
+    
+    return data.filter(item => {
+      const matchesSearch = searchTerm === "" || 
+        (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.company && item.company.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesStatus = statusFilter === "all" || 
+        (statusFilter === "active" && item.isActive) ||
+        (statusFilter === "inactive" && !item.isActive);
+      
+      return matchesSearch && matchesStatus;
+    });
   };
 
   const StatCard = ({ title, value, icon: Icon, color, description }: any) => (
@@ -120,12 +179,37 @@ export default function AdminDashboardPage() {
     </Card>
   );
 
-  const DataTable = ({ title, data, type, deleteMutation }: any) => (
+  const FilterBar = () => (
+    <div className="flex items-center space-x-4 space-x-reverse mb-6">
+      <div className="flex-1">
+        <div className="relative">
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            placeholder="البحث..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pr-10"
+          />
+        </div>
+      </div>
+      <select
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="px-4 py-2 border rounded-lg text-sm"
+      >
+        <option value="all">كل الحالات</option>
+        <option value="active">نشط</option>
+        <option value="inactive">غير نشط</option>
+      </select>
+    </div>
+  );
+
+  const ManagementTable = ({ title, data, type, icon: Icon, color }: any) => (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2 space-x-reverse">
-            <Database className="w-5 h-5" />
+            <Icon className={`w-5 h-5 ${color}`} />
             <span>{title}</span>
           </CardTitle>
           <Button
@@ -139,14 +223,23 @@ export default function AdminDashboardPage() {
         </div>
       </CardHeader>
       <CardContent>
+        <FilterBar />
         <div className="space-y-3 max-h-96 overflow-y-auto">
-          {data.map((item: any) => (
+          {filteredData(data, type).map((item: any) => (
             <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
               <div className="flex-1">
-                <h3 className="font-medium text-gray-800">
-                  {item.name || item.title}
-                </h3>
-                <p className="text-sm text-gray-600">
+                <div className="flex items-center space-x-3 space-x-reverse mb-2">
+                  <h3 className="font-medium text-gray-800">
+                    {item.name || item.title}
+                  </h3>
+                  <Badge 
+                    variant={item.isActive ? "default" : "secondary"}
+                    className={item.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}
+                  >
+                    {item.isActive ? "نشط" : "غير نشط"}
+                  </Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-1">
                   {type === 'products' && `${item.price} - ${item.category}`}
                   {type === 'services' && `${item.phone} - ${item.category}`}
                   {type === 'jobs' && `${item.company} - ${item.type}`}
@@ -157,19 +250,42 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <div className="flex items-center space-x-2 space-x-reverse">
-                <Button variant="ghost" size="sm" className="text-blue-600">
+                {type === 'announcements' && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-green-600 hover:bg-green-50"
+                      onClick={() => approveAnnouncementMutation.mutate(item.id)}
+                    >
+                      <Check className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-600 hover:bg-red-50"
+                      onClick={() => rejectAnnouncementMutation.mutate(item.id)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
+                <Button variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50">
                   <Eye className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="text-green-600">
+                <Button variant="ghost" size="sm" className="text-orange-600 hover:bg-orange-50">
                   <Edit className="w-4 h-4" />
                 </Button>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-red-600"
+                  className="text-red-600 hover:bg-red-50"
                   onClick={() => {
                     if (confirm(`هل أنت متأكد من حذف "${item.name || item.title}"؟`)) {
-                      deleteMutation.mutate(item.id);
+                      if (type === 'products') deleteProductMutation.mutate(item.id);
+                      if (type === 'services') deleteServiceMutation.mutate(item.id);
+                      if (type === 'jobs') deleteJobMutation.mutate(item.id);
+                      if (type === 'announcements') deleteAnnouncementMutation.mutate(item.id);
                     }
                   }}
                 >
@@ -178,15 +294,170 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           ))}
-          {data.length === 0 && (
+          {filteredData(data, type).length === 0 && (
             <div className="text-center py-8 text-gray-500">
-              لا توجد بيانات
+              <Database className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <p>لا توجد بيانات مطابقة</p>
             </div>
           )}
         </div>
       </CardContent>
     </Card>
   );
+
+  const UserManagementTable = () => {
+    const mockUsers = [
+      { id: 1, username: "admin", fullName: "المدير العام", type: "admin", isActive: true, createdAt: new Date() },
+      { id: 2, username: "store_owner", fullName: "صاحب متجر", type: "business", isActive: true, createdAt: new Date() },
+      { id: 3, username: "user123", fullName: "مستخدم عادي", type: "user", isActive: true, createdAt: new Date() },
+    ];
+
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center space-x-2 space-x-reverse">
+              <Users className="w-5 h-5 text-blue-600" />
+              <span>إدارة المستخدمين</span>
+            </CardTitle>
+            <Button
+              onClick={() => setLocation("/add-user")}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <UserPlus className="w-4 h-4 ml-2" />
+              إضافة مستخدم
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <FilterBar />
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {mockUsers.map((user) => (
+              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 space-x-reverse mb-2">
+                    <h3 className="font-medium text-gray-800">{user.fullName}</h3>
+                    <Badge 
+                      variant={user.type === 'admin' ? 'destructive' : user.type === 'business' ? 'default' : 'secondary'}
+                      className={
+                        user.type === 'admin' ? 'bg-red-100 text-red-700' :
+                        user.type === 'business' ? 'bg-green-100 text-green-700' :
+                        'bg-gray-100 text-gray-700'
+                      }
+                    >
+                      {user.type === 'admin' ? 'مدير' : user.type === 'business' ? 'صاحب عمل' : 'مستخدم عادي'}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-1">@{user.username}</p>
+                  <p className="text-xs text-gray-400">
+                    ID: {user.id} | تاريخ الإنشاء: {user.createdAt.toLocaleDateString('ar')}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Button variant="ghost" size="sm" className="text-purple-600 hover:bg-purple-50">
+                    <Crown className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50">
+                    <Eye className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-orange-600 hover:bg-orange-50">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      if (confirm(`هل أنت متأكد من حذف المستخدم "${user.fullName}"؟`)) {
+                        toast({ title: "تم حذف المستخدم", description: "تم حذف المستخدم بنجاح" });
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const SystemSettings = () => (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2 space-x-reverse">
+            <Palette className="w-5 h-5 text-purple-600" />
+            <span>إعدادات التصميم</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">شعار التطبيق</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                <Image className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-600">اضغط لرفع شعار جديد</p>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">الألوان الأساسية</label>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="h-10 bg-red-600 rounded border" title="أحمر سوداني"></div>
+                <div className="h-10 bg-green-600 rounded border" title="أخضر سوداني"></div>
+                <div className="h-10 bg-blue-600 rounded border" title="أزرق سوداني"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">اسم التطبيق</label>
+            <Input defaultValue="البيت السوداني" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">الوصف</label>
+            <Input defaultValue="منصة الجالية السودانية في الكويت" />
+          </div>
+          <Button className="w-full bg-purple-600 hover:bg-purple-700">
+            حفظ الإعدادات
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2 space-x-reverse">
+            <FileText className="w-5 h-5 text-green-600" />
+            <span>إعدادات النصوص</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">رسالة الترحيب</label>
+            <Input defaultValue="أهلاً وسهلاً بك في البيت السوداني" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">شروط الاستخدام</label>
+            <textarea 
+              className="w-full p-3 border rounded-lg h-24"
+              defaultValue="شروط الاستخدام للتطبيق..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">معلومات الاتصال</label>
+            <Input defaultValue="للتواصل: info@sudanese-house.com" />
+          </div>
+          <Button className="w-full bg-green-600 hover:bg-green-700">
+            حفظ النصوص
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -253,128 +524,96 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Management Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="products">المنتجات</TabsTrigger>
-            <TabsTrigger value="services">الخدمات</TabsTrigger>
-            <TabsTrigger value="jobs">الوظائف</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="overview">النظرة العامة</TabsTrigger>
             <TabsTrigger value="announcements">الإعلانات</TabsTrigger>
+            <TabsTrigger value="jobs">الوظائف</TabsTrigger>
+            <TabsTrigger value="services">الخدمات</TabsTrigger>
+            <TabsTrigger value="products">المنتجات</TabsTrigger>
+            <TabsTrigger value="users">المستخدمين</TabsTrigger>
+            <TabsTrigger value="settings">الإعدادات</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview">
+          <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 space-x-reverse">
-                    <BarChart3 className="w-5 h-5" />
-                    <span>إحصائيات سريعة</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <span>إجمالي المحتوى</span>
-                      <span className="font-bold">
-                        {products.length + services.length + jobs.length + announcements.length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-green-50 rounded">
-                      <span>المنتجات النشطة</span>
-                      <span className="font-bold text-green-600">
-                        {products.filter((p: any) => p.isAvailable).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
-                      <span>الخدمات النشطة</span>
-                      <span className="font-bold text-blue-600">
-                        {services.filter((s: any) => s.isActive).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 bg-purple-50 rounded">
-                      <span>الوظائف النشطة</span>
-                      <span className="font-bold text-purple-600">
-                        {jobs.filter((j: any) => j.isActive).length}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>إجراءات سريعة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button
-                      onClick={() => setLocation("/add-product")}
-                      className="h-20 flex flex-col items-center justify-center bg-green-600 hover:bg-green-700"
-                    >
-                      <Plus className="w-6 h-6 mb-2" />
-                      <span>إضافة منتج</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="h-20 flex flex-col items-center justify-center"
-                    >
-                      <Settings className="w-6 h-6 mb-2" />
-                      <span>إعدادات النظام</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="h-20 flex flex-col items-center justify-center"
-                    >
-                      <Users className="w-6 h-6 mb-2" />
-                      <span>إدارة المستخدمين</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="h-20 flex flex-col items-center justify-center"
-                    >
-                      <Database className="w-6 h-6 mb-2" />
-                      <span>النسخ الاحتياطي</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <ManagementTable
+                title="آخر المنتجات"
+                data={products.slice(0, 3)}
+                type="products"
+                icon={Package}
+                color="text-green-600"
+              />
+              <ManagementTable
+                title="آخر الخدمات"
+                data={services.slice(0, 3)}
+                type="services"
+                icon={Briefcase}
+                color="text-blue-600"
+              />
+              <ManagementTable
+                title="آخر الوظائف"
+                data={jobs.slice(0, 3)}
+                type="jobs"
+                icon={Users}
+                color="text-purple-600"
+              />
+              <ManagementTable
+                title="آخر الإعلانات"
+                data={announcements.slice(0, 3)}
+                type="announcements"
+                icon={MessageSquare}
+                color="text-orange-600"
+              />
             </div>
           </TabsContent>
 
-          <TabsContent value="products">
-            <DataTable
-              title="إدارة المنتجات"
-              data={products}
-              type="products"
-              deleteMutation={deleteProductMutation}
-            />
-          </TabsContent>
-
-          <TabsContent value="services">
-            <DataTable
-              title="إدارة الخدمات"
-              data={services}
-              type="services"
-              deleteMutation={deleteServiceMutation}
-            />
-          </TabsContent>
-
-          <TabsContent value="jobs">
-            <DataTable
-              title="إدارة الوظائف"
-              data={jobs}
-              type="jobs"
-              deleteMutation={deleteJobMutation}
-            />
-          </TabsContent>
-
-          <TabsContent value="announcements">
-            <DataTable
+          <TabsContent value="announcements" className="space-y-6">
+            <ManagementTable
               title="إدارة الإعلانات"
               data={announcements}
               type="announcements"
-              deleteMutation={deleteAnnouncementMutation}
+              icon={MessageSquare}
+              color="text-orange-600"
             />
+          </TabsContent>
+
+          <TabsContent value="jobs" className="space-y-6">
+            <ManagementTable
+              title="إدارة الوظائف"
+              data={jobs}
+              type="jobs"
+              icon={Users}
+              color="text-purple-600"
+            />
+          </TabsContent>
+
+          <TabsContent value="services" className="space-y-6">
+            <ManagementTable
+              title="إدارة الخدمات"
+              data={services}
+              type="services"
+              icon={Briefcase}
+              color="text-blue-600"
+            />
+          </TabsContent>
+
+          <TabsContent value="products" className="space-y-6">
+            <ManagementTable
+              title="إدارة المنتجات"
+              data={products}
+              type="products"
+              icon={Package}
+              color="text-green-600"
+            />
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-6">
+            <UserManagementTable />
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <SystemSettings />
           </TabsContent>
         </Tabs>
       </div>

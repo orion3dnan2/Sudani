@@ -29,20 +29,19 @@ export default function LoginPage() {
     // Check if username is "admin" (case insensitive)
     const isAdmin = formData.username.toLowerCase() === "admin";
     
-    // Mock authentication - replace with real API call
-    console.log("تسجيل الدخول:", { 
-      username: formData.username, 
-      isAdmin,
-      isLogin 
-    });
-    
-    // Redirect based on username
+    // For admin login, check password
     if (isAdmin) {
-      // Store admin auth and redirect to admin dashboard
-      localStorage.setItem("adminAuth", "true");
-      setLocation("/admin-dashboard");
+      if (formData.password === "123456") {
+        localStorage.setItem("adminAuth", "true");
+        localStorage.setItem("userType", "admin");
+        setLocation("/admin-dashboard");
+      } else {
+        alert("كلمة المرور غير صحيحة للمدير العام");
+        return;
+      }
     } else {
-      // Regular user goes to business dashboard
+      // Regular business users
+      localStorage.setItem("userType", "business");
       setLocation("/business-dashboard");
     }
   };
@@ -58,19 +57,14 @@ export default function LoginPage() {
     // Check if username is "admin" (case insensitive)
     const isAdmin = formData.username.toLowerCase() === "admin";
     
-    // Mock signup - replace with real API call
-    console.log("إنشاء حساب جديد:", { 
-      ...formData, 
-      isAdmin
-    });
-    
-    // Redirect to appropriate dashboard
     if (isAdmin) {
-      localStorage.setItem("adminAuth", "true");
-      setLocation("/admin-dashboard");
-    } else {
-      setLocation("/business-dashboard");
+      alert("لا يمكن إنشاء حساب مدير جديد");
+      return;
     }
+    
+    // Create business account
+    localStorage.setItem("userType", "business");
+    setLocation("/business-dashboard");
   };
 
   return (

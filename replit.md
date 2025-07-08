@@ -119,6 +119,7 @@ Changelog:
 - July 08, 2025. Enhanced Services page with specialized sections: "شركات شحن", "شركات سفر وسياحة", "عيادات وأطباء سودانيين"
 - July 08, 2025. Added comprehensive authentication system with user roles (regular users and business owners) including login page and business dashboard
 - July 08, 2025. Implemented admin authentication system with comprehensive admin dashboard featuring full CRUD operations for all data entities (products, services, jobs, announcements) with secure delete functionality
+- July 08, 2025. Enhanced admin dashboard with comprehensive management system including: Announcements approval/rejection system, Jobs management, Services management, Products management, User management with role-based access, System settings for app customization (logo, colors, texts)
 
 ## User Preferences
 
