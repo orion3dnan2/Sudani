@@ -45,14 +45,25 @@ export default function Navigation() {
             );
           })}
 
-          {/* Dashboard Button - Only for business owners and admins */}
-          {(mockUser.type === "business" || isAdmin) && (
+          {/* Admin Dashboard Button - Only for admins (developers) */}
+          {isAdmin && (
             <button
-              onClick={() => setLocation(isAdmin ? "/admin-dashboard" : "/business-dashboard")}
+              onClick={() => setLocation("/admin-dashboard")}
               className={`flex flex-col items-center py-2 px-3 ${
-                location === "/admin-dashboard" || location === "/business-dashboard" 
-                  ? "text-sudan-red" 
-                  : "text-gray-600"
+                location === "/admin-dashboard" ? "text-sudan-red" : "text-gray-600"
+              }`}
+            >
+              <Settings className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">لوحة تحكم المطور</span>
+            </button>
+          )}
+
+          {/* Business Dashboard Button - Only for business owners (not admins) */}
+          {mockUser.type === "business" && !isAdmin && (
+            <button
+              onClick={() => setLocation("/business-dashboard")}
+              className={`flex flex-col items-center py-2 px-3 ${
+                location === "/business-dashboard" ? "text-sudan-red" : "text-gray-600"
               }`}
             >
               <Settings className="h-5 w-5 mb-1" />

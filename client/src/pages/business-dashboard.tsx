@@ -13,8 +13,10 @@ import {
   Trash2,
   Bell,
   Calendar,
-  DollarSign
+  DollarSign,
+  Briefcase
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -84,6 +86,7 @@ export default function BusinessDashboardPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-800">لوحة تحكم الأعمال</h1>
               <p className="text-gray-600">{businessData.name} - {businessData.type}</p>
+              <Badge className="bg-green-100 text-green-700 text-xs mt-1">🏢 صاحب عمل - صلاحيات محدودة</Badge>
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">
