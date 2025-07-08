@@ -1,8 +1,18 @@
 import { useLocation } from "wouter";
-import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store, LogOut } from "lucide-react";
+import { Home, ShoppingBasket, Building, Briefcase, Megaphone, Store, LogOut, Settings } from "lucide-react";
 
 export default function Navigation() {
   const [location, setLocation] = useLocation();
+
+  // Mock user data - replace with real authentication state
+  const mockUser = {
+    name: "أحمد محمد",
+    type: "business" as const, // Could be "business" or "user"
+    avatar: undefined
+  };
+
+  // Check if current user is admin
+  const isAdmin = localStorage.getItem("adminAuth") === "true";
 
   const navItems = [
     { path: "/dashboard", icon: Home, label: "الرئيسية" },
@@ -34,6 +44,21 @@ export default function Navigation() {
               </button>
             );
           })}
+
+          {/* Dashboard Button - Only for business owners and admins */}
+          {(mockUser.type === "business" || isAdmin) && (
+            <button
+              onClick={() => setLocation(isAdmin ? "/admin-dashboard" : "/business-dashboard")}
+              className={`flex flex-col items-center py-2 px-3 ${
+                location === "/admin-dashboard" || location === "/business-dashboard" 
+                  ? "text-sudan-red" 
+                  : "text-gray-600"
+              }`}
+            >
+              <Settings className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium">لوحة التحكم</span>
+            </button>
+          )}
           
           {/* Logout Button */}
           <button
