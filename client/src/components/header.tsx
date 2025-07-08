@@ -23,16 +23,23 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 transition-colors duration-300">
+    <header className="bg-white dark:bg-card shadow-sm sticky top-0 z-50 transition-colors duration-300 border-b border-gray-200 dark:border-border">
       <div className="max-w-6xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 space-x-reverse">
-            <div className="w-12 h-12 bg-gradient-to-r from-sudan-red to-sudan-green rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">🏠</span>
+            <div className="w-14 h-14 bg-gradient-to-r from-sudan-red to-sudan-green rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">🏠</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800 dark:text-white">البيت السوداني</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300">سوداني وخليك قدها 🇸🇩</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground">البيت السوداني</h1>
+              <p className="text-sm text-gray-600 dark:text-muted-foreground">سوداني وخليك قدها 🇸🇩</p>
+              {/* System Status Badge */}
+              <div className="flex items-center mt-1">
+                <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 rounded-full">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
+                  نشط
+                </span>
+              </div>
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">
@@ -41,58 +48,25 @@ export default function Header() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="w-11 h-11 rounded-full hover:bg-gray-100 dark:hover:bg-accent transition-colors"
               title={theme === "light" ? "تبديل للوضع الليلي" : "تبديل للوضع النهاري"}
             >
               {theme === "light" ? (
-                <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <Moon className="h-5 w-5 text-gray-600 dark:text-muted-foreground" />
               ) : (
-                <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <Sun className="h-5 w-5 text-yellow-500" />
               )}
             </Button>
-
-            {isAdmin && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/admin-dashboard")}
-                  className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800"
-                  title="العودة إلى لوحة التحكم"
-                >
-                  <Settings className="h-5 w-5 text-red-600 dark:text-red-400" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/dashboard")}
-                  className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
-                  title="العودة إلى واجهة المستخدم"
-                >
-                  <RefreshCw className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  title="الإشعارات"
-                >
-                  <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                </Button>
-              </>
-            )}
             
             {mockUser ? (
               <UserMenu user={mockUser} />
             ) : (
               <Button
-                variant="ghost"
-                size="icon"
                 onClick={() => setLocation("/login")}
-                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-                title="تسجيل الدخول"
+                variant="outline"
+                className="border-gray-300 dark:border-border text-gray-700 dark:text-foreground hover:bg-gray-50 dark:hover:bg-accent transition-colors px-6 py-2"
               >
-                <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                تسجيل الدخول
               </Button>
             )}
           </div>

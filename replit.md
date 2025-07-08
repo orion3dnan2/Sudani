@@ -129,6 +129,7 @@ Changelog:
 - July 08, 2025. Successfully migrated project from Replit Agent to Replit environment: Completed full migration process with all dependencies installed and working properly, Verified role-based access control security in both light and dark modes, ensured business owners only see store-related options without developer/admin access, Confirmed application runs cleanly with proper client/server separation and security practices
 - July 08, 2025. Updated application slogan: Changed welcome message from "جاليتك في خدمتك" to "سوداني وخليك قدها" to better reflect the community spirit
 - July 08, 2025. Updated color scheme: Changed application theme from red/green to light sky blue throughout the interface for a more modern and appealing look
+- July 08, 2025. Enhanced dark mode with WCAG compliance: Implemented soft gray backgrounds (#1e1e2f) instead of pure black, improved text contrast with white/light gray text colors, consolidated admin controls into user dropdown menu, added system status badge, enhanced button styling with better hover states and shadows, improved spacing and typography throughout the interface
 
 ## User Preferences
 
