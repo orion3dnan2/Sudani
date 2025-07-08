@@ -44,9 +44,7 @@ export default function AddProductPage() {
       category: "",
       phone: "",
       address: "",
-      rating: "4.5",
-      imageUrl: "",
-      isActive: true
+      imageUrl: ""
     }
   });
 
@@ -73,7 +71,16 @@ export default function AddProductPage() {
 
   // Add service mutation
   const addServiceMutation = useMutation({
-    mutationFn: (data: InsertService) => apiRequest('/api/services', { method: 'POST', body: JSON.stringify(data) }),
+    mutationFn: (data: InsertService) => {
+      console.log("Sending service data:", data);
+      return apiRequest('/api/services', { 
+        method: 'POST', 
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/services'] });
       serviceForm.reset();
@@ -83,10 +90,11 @@ export default function AddProductPage() {
       });
       setLocation("/business-dashboard");
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Service creation error:", error);
       toast({
         title: "خطأ في إضافة الخدمة",
-        description: "حدث خطأ أثناء إضافة الخدمة. يرجى المحاولة مرة أخرى.",
+        description: error.message || "حدث خطأ أثناء إضافة الخدمة. يرجى التأكد من ملء جميع الحقول المطلوبة.",
         variant: "destructive",
       });
     }
@@ -97,6 +105,8 @@ export default function AddProductPage() {
   };
 
   const onSubmitService = (data: InsertService) => {
+    console.log("Form data before submission:", data);
+    console.log("Form errors:", serviceForm.formState.errors);
     addServiceMutation.mutate(data);
   };
 
@@ -349,14 +359,14 @@ export default function AddProductPage() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="مطاعم">🍽️ مطاعم</SelectItem>
-                              <SelectItem value="صالونات">✂️ صالونات</SelectItem>
+                              <SelectItem value="مطعم">🍽️ مطعم</SelectItem>
+                              <SelectItem value="صالون">✂️ صالون</SelectItem>
                               <SelectItem value="خدمات قانونية">⚖️ خدمات قانونية</SelectItem>
                               <SelectItem value="خدمات تقنية">💻 خدمات تقنية</SelectItem>
                               <SelectItem value="مواصلات">🚗 مواصلات</SelectItem>
-                              <SelectItem value="شركات شحن">🚚 شركات شحن</SelectItem>
-                              <SelectItem value="شركات سفر وسياحة">✈️ شركات سفر وسياحة</SelectItem>
-                              <SelectItem value="عيادات وأطباء سودانيين">🏥 عيادات وأطباء سودانيين</SelectItem>
+                              <SelectItem value="شركة شحن">🚚 شركة شحن</SelectItem>
+                              <SelectItem value="شركة سفر وسياحة">✈️ شركة سفر وسياحة</SelectItem>
+                              <SelectItem value="عيادة طبية">🏥 عيادة طبية</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />

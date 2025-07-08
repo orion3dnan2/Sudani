@@ -66,11 +66,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/services", async (req, res) => {
     try {
+      console.log("Received service data:", req.body);
       const validatedData = insertServiceSchema.parse(req.body);
+      console.log("Validated service data:", validatedData);
       const service = await storage.createService(validatedData);
       res.status(201).json(service);
-    } catch (error) {
-      res.status(400).json({ error: "Invalid service data" });
+    } catch (error: any) {
+      console.error("Service creation error:", error);
+      if (error.name === 'ZodError') {
+        res.status(400).json({ 
+          error: "Invalid service data", 
+          details: error.errors,
+          message: "تأكد من ملء جميع الحقول المطلوبة بشكل صحيح"
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to create service",
+          message: "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى."
+        });
+      }
     }
   });
 
