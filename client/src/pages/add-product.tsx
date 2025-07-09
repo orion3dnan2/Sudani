@@ -30,8 +30,7 @@ export default function AddProductPage() {
       category: "",
       price: "",
       imageUrl: "",
-      contactInfo: "",
-      isAvailable: true
+      whatsappPhone: ""
     }
   });
 
@@ -50,11 +49,7 @@ export default function AddProductPage() {
 
   // Add product mutation
   const addProductMutation = useMutation({
-    mutationFn: async (data: InsertProduct) => {
-      console.log("Sending product data:", data);
-      const response = await apiRequest('POST', '/api/products', data);
-      return response.json();
-    },
+    mutationFn: (data: InsertProduct) => apiRequest('/api/products', { method: 'POST', body: JSON.stringify(data) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       productForm.reset();
@@ -75,11 +70,7 @@ export default function AddProductPage() {
 
   // Add service mutation
   const addServiceMutation = useMutation({
-    mutationFn: async (data: InsertService) => {
-      console.log("Sending service data:", data);
-      const response = await apiRequest('POST', '/api/services', data);
-      return response.json();
-    },
+    mutationFn: (data: InsertService) => apiRequest('/api/services', { method: 'POST', body: JSON.stringify(data) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/services'] });
       serviceForm.reset();
@@ -230,10 +221,10 @@ export default function AddProductPage() {
 
                     <FormField
                       control={productForm.control}
-                      name="contactInfo"
+                      name="whatsappPhone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>رقم الهاتف للطلب</FormLabel>
+                          <FormLabel>رقم واتساب للطلب</FormLabel>
                           <FormControl>
                             <Input placeholder="+96599123456" {...field} />
                           </FormControl>

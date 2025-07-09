@@ -1,9 +1,41 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProductSchema, insertServiceSchema, insertJobSchema, insertAnnouncementSchema } from "@shared/schema";
+import { insertProductSchema, insertServiceSchema, insertJobSchema, insertAnnouncementSchema, insertUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Users routes
+  app.post("/api/users", async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(validatedData.username);
+      if (existingUser) {
+        return res.status(400).json({ 
+          error: "Username already exists",
+          message: "اسم المستخدم موجود بالفعل، يرجى اختيار اسم آخر"
+        });
+      }
+      
+      const user = await storage.createUser(validatedData);
+      res.status(201).json({ id: user.id, username: user.username, fullName: user.fullName });
+    } catch (error: any) {
+      console.error("User creation error:", error);
+      if (error.name === 'ZodError') {
+        res.status(400).json({ 
+          error: "Invalid user data", 
+          details: error.errors,
+          message: "تأكد من ملء جميع الحقول المطلوبة بشكل صحيح"
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to create user",
+          message: "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى."
+        });
+      }
+    }
+  });
   // Products routes
   app.get("/api/products", async (req, res) => {
     try {

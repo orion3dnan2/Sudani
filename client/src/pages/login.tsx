@@ -62,9 +62,40 @@ export default function LoginPage() {
       return;
     }
     
-    // Create business account
-    localStorage.setItem("userType", "business");
-    setLocation("/business-dashboard");
+    try {
+      // Create new business user in database
+      const userData = {
+        username: formData.username,
+        password: formData.password,
+        fullName: formData.businessName || formData.username,
+        phone: "", // This can be filled later in profile
+        email: "", // This can be filled later in profile
+      };
+      
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.message || "فشل في إنشاء الحساب");
+        return;
+      }
+      
+      // Store user data and redirect
+      localStorage.setItem("userType", "business");
+      localStorage.setItem("username", formData.username);
+      setLocation("/business-dashboard");
+      
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("حدث خطأ أثناء إنشاء الحساب");
+    }
   };
 
   return (
