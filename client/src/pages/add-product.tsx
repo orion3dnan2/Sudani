@@ -59,10 +59,12 @@ export default function AddProductPage() {
       });
       setLocation("/business-dashboard");
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Product creation error:", error);
+      const errorMessage = error.message || "حدث خطأ أثناء إضافة المنتج. يرجى المحاولة مرة أخرى.";
       toast({
         title: "خطأ في إضافة المنتج",
-        description: "حدث خطأ أثناء إضافة المنتج. يرجى المحاولة مرة أخرى.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -91,6 +93,8 @@ export default function AddProductPage() {
   });
 
   const onSubmitProduct = (data: InsertProduct) => {
+    console.log("Form data before submission:", data);
+    console.log("Form errors:", productForm.formState.errors);
     addProductMutation.mutate(data);
   };
 

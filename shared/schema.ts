@@ -91,6 +91,8 @@ export const insertProductSchema = createInsertSchema(products).pick({
   category: true,
   imageUrl: true,
   whatsappPhone: true,
+}).extend({
+  price: z.string().min(1, "السعر مطلوب").transform((val) => val.toString()),
 });
 
 export const insertServiceSchema = createInsertSchema(services).pick({
@@ -118,6 +120,8 @@ export const insertAnnouncementSchema = createInsertSchema(announcements).pick({
   price: true,
   phone: true,
   imageUrl: true,
+}).extend({
+  price: z.string().optional().transform((val) => val || null),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
