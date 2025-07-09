@@ -22,7 +22,28 @@ import {
   X,
   Search,
   Filter,
-  RefreshCw
+  RefreshCw,
+  User,
+  Bell,
+  Activity,
+  TrendingUp,
+  PieChart,
+  BarChart,
+  Camera,
+  Lock,
+  Mail,
+  Phone,
+  Globe,
+  Send,
+  Archive,
+  UserPlus,
+  UserMinus,
+  UserCheck,
+  UserX,
+  ChevronRight,
+  Menu,
+  Home,
+  LogOut
 } from "lucide-react";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
@@ -35,7 +56,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type User, type Product, type Service, type Job, type Announcement } from "@shared/schema";
+import { User as UserType, Product, Service, Job, Announcement } from "@shared/schema";
 
 interface DashboardStats {
   totalUsers: number;
@@ -66,10 +87,20 @@ interface BackupInfo {
 export default function AdminDashboardNew() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<UserType | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: "أحمد محمد",
+    email: "admin@sudanhouse.com",
+    phone: "+965 5555 1234",
+    role: "مطور النظام",
+    avatar: ""
+  });
+  const [notificationText, setNotificationText] = useState("");
+  const [notificationTarget, setNotificationTarget] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -80,7 +111,7 @@ export default function AdminDashboardNew() {
   });
 
   // Fetch users
-  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
+  const { data: users = [], isLoading: usersLoading } = useQuery<UserType[]>({
     queryKey: ['/api/users'],
     queryFn: () => apiRequest('/api/users'),
   });
