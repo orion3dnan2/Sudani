@@ -23,7 +23,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sudanese-card sticky top-0 z-50 transition-all duration-300 border-b-2 border-sudan-gold">
+    <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 transition-all duration-300 border-b-2 border-sudan-gold shadow-lg">
       <div className="max-w-6xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 space-x-reverse">
@@ -32,7 +32,7 @@ export default function Header() {
               <span className="text-white font-bold text-xl relative z-10">🏠</span>
             </div>
             <div>
-              <h1 className="heritage-text text-2xl font-bold">البيت السوداني</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">البيت السوداني</h1>
               <p className="text-sm text-sudan-earth dark:text-sudan-sand font-medium">سوداني وخليك قدها 🇸🇩</p>
             </div>
           </div>
@@ -42,13 +42,13 @@ export default function Header() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="w-10 h-10 rounded-full hover:bg-sudan-sand dark:hover:bg-sudan-copper/20 border border-sudan-gold/30"
               title={theme === "light" ? "تبديل للوضع الليلي" : "تبديل للوضع النهاري"}
             >
               {theme === "light" ? (
-                <Moon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <Moon className="h-5 w-5 text-sudan-earth dark:text-sudan-sand" />
               ) : (
-                <Sun className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <Sun className="h-5 w-5 text-sudan-earth dark:text-sudan-sand" />
               )}
             </Button>
 
@@ -58,7 +58,7 @@ export default function Header() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setLocation("/admin-dashboard")}
-                  className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800"
+                  className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 hover:bg-red-200 dark:hover:bg-red-800 border border-red-300 dark:border-red-700"
                   title="العودة إلى لوحة التحكم"
                 >
                   <Settings className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -67,7 +67,7 @@ export default function Header() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setLocation("/dashboard")}
-                  className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800"
+                  className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 border border-blue-300 dark:border-blue-700"
                   title="العودة إلى واجهة المستخدم"
                 >
                   <RefreshCw className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -75,10 +75,10 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="w-10 h-10 rounded-full bg-sudan-sand dark:bg-sudan-copper/20 hover:bg-sudan-gold/30 dark:hover:bg-sudan-copper/30 border border-sudan-gold/50"
                   title="الإشعارات"
                 >
-                  <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  <Bell className="h-5 w-5 text-sudan-earth dark:text-sudan-sand" />
                 </Button>
               </>
             )}
@@ -90,10 +90,10 @@ export default function Header() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setLocation("/login")}
-                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="w-10 h-10 rounded-full bg-sudan-sand dark:bg-sudan-copper/20 hover:bg-sudan-gold/30 dark:hover:bg-sudan-copper/30 border border-sudan-gold/50"
                 title="تسجيل الدخول"
               >
-                <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                <User className="h-5 w-5 text-sudan-earth dark:text-sudan-sand" />
               </Button>
             )}
           </div>

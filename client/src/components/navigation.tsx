@@ -31,7 +31,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 sudanese-card border-t-2 border-sudan-gold px-4 py-3 transition-all duration-300 backdrop-blur-sm">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t-2 border-sudan-gold px-4 py-3 transition-all duration-300 backdrop-blur-sm shadow-lg">
       <div className="max-w-md mx-auto">
         <div className="flex justify-around">
           {navItems.slice(0, 4).map((item) => {
@@ -43,7 +43,7 @@ export default function Navigation() {
                 key={item.path}
                 onClick={() => setLocation(item.path)}
                 className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-300 ${
-                  isActive ? "text-sudan-red bg-sudan-sand/30 dark:bg-sudan-copper/20 border border-sudan-gold shadow-sm" : "text-sudan-earth dark:text-sudan-sand hover:bg-sudan-sand/20 dark:hover:bg-sudan-copper/10 hover:text-sudan-red"
+                  isActive ? "text-sudan-red bg-sudan-sand/50 dark:bg-sudan-copper/30 border border-sudan-gold shadow-lg" : "text-sudan-earth dark:text-sudan-sand hover:bg-sudan-sand/30 dark:hover:bg-sudan-copper/20 hover:text-sudan-red"
                 }`}
               >
                 <Icon className="h-6 w-6 mb-1" />
@@ -59,8 +59,8 @@ export default function Navigation() {
             <DropdownMenuTrigger asChild>
               <button className={`flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-300 ${
                 location === "/admin-dashboard" || location === "/business-dashboard" || location === "/jobs" || location === "/announcements"
-                  ? "text-sudan-red bg-sudan-sand/30 dark:bg-sudan-copper/20 border border-sudan-gold shadow-sm" 
-                  : "text-sudan-earth dark:text-sudan-sand hover:bg-sudan-sand/20 dark:hover:bg-sudan-copper/10 hover:text-sudan-red"
+                  ? "text-sudan-red bg-sudan-sand/50 dark:bg-sudan-copper/30 border border-sudan-gold shadow-lg" 
+                  : "text-sudan-earth dark:text-sudan-sand hover:bg-sudan-sand/30 dark:hover:bg-sudan-copper/20 hover:text-sudan-red"
               }`}>
                 <User className="h-6 w-6 mb-1" />
                 <span className="text-xs font-medium">الحساب</span>
