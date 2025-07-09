@@ -24,6 +24,7 @@ export default function StoreSettingsPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
   
   // Mock store data
   const [storeData, setStoreData] = useState({
@@ -47,17 +48,24 @@ export default function StoreSettingsPage() {
     }
   });
 
-  const handleSave = () => {
+  const handleSave = (section?: string) => {
     toast({
       title: "تم حفظ الإعدادات بنجاح",
       description: "تم تحديث بيانات المتجر",
     });
     setIsEditing(false);
+    setEditingSection(null);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
+    setEditingSection(null);
     // Reset form data here if needed
+  };
+
+  const handleEditSection = (section: string) => {
+    setEditingSection(section);
+    setIsEditing(true);
   };
 
   return (
@@ -81,32 +89,9 @@ export default function StoreSettingsPage() {
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">
-            {!isEditing ? (
-              <Button
-                onClick={() => setIsEditing(true)}
-                className="bg-sudan-blue hover:bg-blue-600 text-white"
-              >
-                <Edit className="w-4 h-4 ml-2" />
-                تعديل البيانات
-              </Button>
-            ) : (
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <Button
-                  onClick={handleSave}
-                  className="bg-sudan-green hover:bg-green-600 text-white"
-                >
-                  <Save className="w-4 h-4 ml-2" />
-                  حفظ
-                </Button>
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  className="border-gray-300 text-gray-700"
-                >
-                  إلغاء
-                </Button>
-              </div>
-            )}
+            <div className="text-sm text-gray-500">
+              استخدم أزرار التعديل لكل قسم منفصل
+            </div>
           </div>
         </div>
 
@@ -115,9 +100,22 @@ export default function StoreSettingsPage() {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 space-x-reverse">
-                <Store className="w-5 h-5 text-blue-600" />
-                <span>المعلومات الأساسية</span>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Store className="w-5 h-5 text-blue-600" />
+                  <span>المعلومات الأساسية</span>
+                </div>
+                {editingSection !== "basic" && (
+                  <Button
+                    onClick={() => handleEditSection("basic")}
+                    variant="outline"
+                    size="sm"
+                    className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                  >
+                    <Edit className="w-4 h-4 ml-2" />
+                    تعديل
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -129,8 +127,8 @@ export default function StoreSettingsPage() {
                   <Input
                     value={storeData.name}
                     onChange={(e) => setStoreData({...storeData, name: e.target.value})}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "basic"}
+                    className={editingSection !== "basic" ? "bg-gray-50" : ""}
                   />
                 </div>
                 <div>
@@ -140,8 +138,8 @@ export default function StoreSettingsPage() {
                   <Input
                     value={storeData.ownerName}
                     onChange={(e) => setStoreData({...storeData, ownerName: e.target.value})}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "basic"}
+                    className={editingSection !== "basic" ? "bg-gray-50" : ""}
                     placeholder="أدخل اسم صاحب العمل"
                   />
                 </div>
@@ -154,8 +152,8 @@ export default function StoreSettingsPage() {
                   <select 
                     value={storeData.type}
                     onChange={(e) => setStoreData({...storeData, type: e.target.value})}
-                    disabled={!isEditing}
-                    className={`w-full px-3 py-2 border rounded-md ${!isEditing ? "bg-gray-50" : ""}`}
+                    disabled={editingSection !== "basic"}
+                    className={`w-full px-3 py-2 border rounded-md ${editingSection !== "basic" ? "bg-gray-50" : ""}`}
                   >
                     <option value="مطعم">مطعم</option>
                     <option value="متجر">متجر</option>
@@ -172,20 +170,51 @@ export default function StoreSettingsPage() {
                 <textarea
                   value={storeData.description}
                   onChange={(e) => setStoreData({...storeData, description: e.target.value})}
-                  disabled={!isEditing}
+                  disabled={editingSection !== "basic"}
                   rows={3}
-                  className={`w-full px-3 py-2 border rounded-md resize-none ${!isEditing ? "bg-gray-50" : ""}`}
+                  className={`w-full px-3 py-2 border rounded-md resize-none ${editingSection !== "basic" ? "bg-gray-50" : ""}`}
                 />
               </div>
+              {editingSection === "basic" && (
+                <div className="flex items-center space-x-2 space-x-reverse pt-4 border-t">
+                  <Button
+                    onClick={() => handleSave("basic")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Save className="w-4 h-4 ml-2" />
+                    حفظ التغييرات
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Contact Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 space-x-reverse">
-                <Phone className="w-5 h-5 text-green-600" />
-                <span>معلومات الاتصال</span>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Phone className="w-5 h-5 text-green-600" />
+                  <span>معلومات الاتصال</span>
+                </div>
+                {editingSection !== "contact" && (
+                  <Button
+                    onClick={() => handleEditSection("contact")}
+                    variant="outline"
+                    size="sm"
+                    className="text-green-600 border-green-600 hover:bg-green-50"
+                  >
+                    <Edit className="w-4 h-4 ml-2" />
+                    تعديل
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -197,8 +226,8 @@ export default function StoreSettingsPage() {
                   <Input
                     value={storeData.phone}
                     onChange={(e) => setStoreData({...storeData, phone: e.target.value})}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "contact"}
+                    className={editingSection !== "contact" ? "bg-gray-50" : ""}
                   />
                 </div>
                 <div>
@@ -208,8 +237,8 @@ export default function StoreSettingsPage() {
                   <Input
                     value={storeData.whatsapp}
                     onChange={(e) => setStoreData({...storeData, whatsapp: e.target.value})}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "contact"}
+                    className={editingSection !== "contact" ? "bg-gray-50" : ""}
                   />
                 </div>
               </div>
@@ -221,8 +250,8 @@ export default function StoreSettingsPage() {
                 <Input
                   value={storeData.address}
                   onChange={(e) => setStoreData({...storeData, address: e.target.value})}
-                  disabled={!isEditing}
-                  className={!isEditing ? "bg-gray-50" : ""}
+                  disabled={editingSection !== "contact"}
+                  className={editingSection !== "contact" ? "bg-gray-50" : ""}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -234,8 +263,8 @@ export default function StoreSettingsPage() {
                   <Input
                     value={storeData.email}
                     onChange={(e) => setStoreData({...storeData, email: e.target.value})}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "contact"}
+                    className={editingSection !== "contact" ? "bg-gray-50" : ""}
                   />
                 </div>
                 <div>
@@ -246,23 +275,54 @@ export default function StoreSettingsPage() {
                   <Input
                     value={storeData.website}
                     onChange={(e) => setStoreData({...storeData, website: e.target.value})}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "contact"}
+                    className={editingSection !== "contact" ? "bg-gray-50" : ""}
                   />
                 </div>
               </div>
+              {editingSection === "contact" && (
+                <div className="flex items-center space-x-2 space-x-reverse pt-4 border-t">
+                  <Button
+                    onClick={() => handleSave("contact")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Save className="w-4 h-4 ml-2" />
+                    حفظ التغييرات
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Working Hours */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 space-x-reverse">
-                <Clock className="w-5 h-5 text-purple-600" />
-                <span>ساعات العمل</span>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Clock className="w-5 h-5 text-purple-600" />
+                  <span>ساعات العمل</span>
+                </div>
+                {editingSection !== "hours" && (
+                  <Button
+                    onClick={() => handleEditSection("hours")}
+                    variant="outline"
+                    size="sm"
+                    className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                  >
+                    <Edit className="w-4 h-4 ml-2" />
+                    تعديل
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -275,8 +335,8 @@ export default function StoreSettingsPage() {
                       ...storeData, 
                       workingHours: {...storeData.workingHours, from: e.target.value}
                     })}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "hours"}
+                    className={editingSection !== "hours" ? "bg-gray-50" : ""}
                   />
                 </div>
                 <div>
@@ -290,20 +350,51 @@ export default function StoreSettingsPage() {
                       ...storeData, 
                       workingHours: {...storeData.workingHours, to: e.target.value}
                     })}
-                    disabled={!isEditing}
-                    className={!isEditing ? "bg-gray-50" : ""}
+                    disabled={editingSection !== "hours"}
+                    className={editingSection !== "hours" ? "bg-gray-50" : ""}
                   />
                 </div>
               </div>
+              {editingSection === "hours" && (
+                <div className="flex items-center space-x-2 space-x-reverse pt-4 border-t">
+                  <Button
+                    onClick={() => handleSave("hours")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Save className="w-4 h-4 ml-2" />
+                    حفظ التغييرات
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Social Media */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 space-x-reverse">
-                <Globe className="w-5 h-5 text-pink-600" />
-                <span>حسابات التواصل الاجتماعي</span>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 space-x-reverse">
+                  <Globe className="w-5 h-5 text-pink-600" />
+                  <span>حسابات التواصل الاجتماعي</span>
+                </div>
+                {editingSection !== "social" && (
+                  <Button
+                    onClick={() => handleEditSection("social")}
+                    variant="outline"
+                    size="sm"
+                    className="text-pink-600 border-pink-600 hover:bg-pink-50"
+                  >
+                    <Edit className="w-4 h-4 ml-2" />
+                    تعديل
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -317,8 +408,8 @@ export default function StoreSettingsPage() {
                     ...storeData, 
                     socialMedia: {...storeData.socialMedia, instagram: e.target.value}
                   })}
-                  disabled={!isEditing}
-                  className={!isEditing ? "bg-gray-50" : ""}
+                  disabled={editingSection !== "social"}
+                  className={editingSection !== "social" ? "bg-gray-50" : ""}
                   placeholder="@username"
                 />
               </div>
@@ -332,8 +423,8 @@ export default function StoreSettingsPage() {
                     ...storeData, 
                     socialMedia: {...storeData.socialMedia, facebook: e.target.value}
                   })}
-                  disabled={!isEditing}
-                  className={!isEditing ? "bg-gray-50" : ""}
+                  disabled={editingSection !== "social"}
+                  className={editingSection !== "social" ? "bg-gray-50" : ""}
                   placeholder="اسم الصفحة"
                 />
               </div>
@@ -347,11 +438,29 @@ export default function StoreSettingsPage() {
                     ...storeData, 
                     socialMedia: {...storeData.socialMedia, twitter: e.target.value}
                   })}
-                  disabled={!isEditing}
-                  className={!isEditing ? "bg-gray-50" : ""}
+                  disabled={editingSection !== "social"}
+                  className={editingSection !== "social" ? "bg-gray-50" : ""}
                   placeholder="@username"
                 />
               </div>
+              {editingSection === "social" && (
+                <div className="flex items-center space-x-2 space-x-reverse pt-4 border-t">
+                  <Button
+                    onClick={() => handleSave("social")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Save className="w-4 h-4 ml-2" />
+                    حفظ التغييرات
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
