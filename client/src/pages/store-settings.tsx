@@ -28,6 +28,7 @@ export default function StoreSettingsPage() {
   // Mock store data
   const [storeData, setStoreData] = useState({
     name: "مطعم الأصالة السوداني",
+    ownerName: "أحمد محمد علي",
     type: "مطعم",
     description: "مطعم متخصص في الأكلات السودانية الأصيلة",
     phone: "+965 1234 5678",
@@ -134,6 +135,20 @@ export default function StoreSettingsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    اسم صاحب العمل
+                  </label>
+                  <Input
+                    value={storeData.ownerName}
+                    onChange={(e) => setStoreData({...storeData, ownerName: e.target.value})}
+                    disabled={!isEditing}
+                    className={!isEditing ? "bg-gray-50" : ""}
+                    placeholder="أدخل اسم صاحب العمل"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     نوع النشاط
                   </label>
                   <select 
@@ -148,6 +163,7 @@ export default function StoreSettingsPage() {
                     <option value="محل تجاري">محل تجاري</option>
                   </select>
                 </div>
+                <div></div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
