@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Eye, EyeOff, ArrowRight, Shield, Briefcase, Lock } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Shield, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -166,7 +166,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Business Fields for Signup */}
+              {/* Business Fields for Signup (only for non-admin users) */}
               {!isLogin && formData.username.toLowerCase() !== "admin" && (
                 <>
                   <div className="space-y-2">
@@ -176,7 +176,7 @@ export default function LoginPage() {
                       placeholder="مثال: مطعم الأصالة السوداني"
                       value={formData.businessName}
                       onChange={(e) => handleInputChange("businessName", e.target.value)}
-                      className="text-right w-full py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50/50 transition-all duration-300"
+                      className="text-right"
                       required
                     />
                   </div>
@@ -186,7 +186,7 @@ export default function LoginPage() {
                     <select
                       value={formData.businessType}
                       onChange={(e) => handleInputChange("businessType", e.target.value)}
-                      className="w-full py-4 border border-gray-200 rounded-2xl text-right bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300"
+                      className="w-full p-3 border border-gray-300 rounded-lg text-right"
                       required
                     >
                       <option value="">اختر نوع النشاط</option>
@@ -213,15 +213,15 @@ export default function LoginPage() {
                     placeholder="أدخل كلمة المرور"
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
-                    className="text-right w-full py-4 pl-12 pr-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50/50 transition-all duration-300"
+                    className="text-right pl-10 pr-4 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50/50 transition-all duration-300"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -235,58 +235,63 @@ export default function LoginPage() {
                     placeholder="أعد إدخال كلمة المرور"
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                    className="text-right w-full py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50/50 transition-all duration-300"
+                    className="text-right"
                     required
                   />
                 </div>
               )}
 
-              {/* Login Button */}
-              <Button 
-                type="submit" 
-                className="w-full bg-[#007F5F] hover:bg-[#006B4F] text-white py-4 text-lg font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center space-x-2 space-x-reverse"
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className={`w-full py-3 text-white font-medium rounded-lg transition-colors ${
+                  formData.username.toLowerCase() === "admin"
+                    ? "bg-sudan-red hover:bg-red-600"
+                    : "bg-sudan-green hover:bg-green-600"
+                }`}
               >
-                <Lock className="w-5 h-5" />
-                <span>{isLogin ? "تسجيل الدخول التلقائي" : "إنشاء حساب جديد"}</span>
-              </Button>
-
-              {/* Forgot Password Link (only for login) */}
-              {isLogin && (
-                <div className="text-center">
-                  <button
-                    type="button"
-                    className="text-sm text-gray-500 hover:text-teal-600 transition-colors"
-                    onClick={() => alert("يرجى الاتصال بالمدير العام لإعادة تعيين كلمة المرور")}
-                  >
-                    نسيت كلمة المرور؟
-                  </button>
+                <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                  {formData.username.toLowerCase() === "admin" ? (
+                    <Shield className="w-4 h-4" />
+                  ) : (
+                    <Briefcase className="w-4 h-4" />
+                  )}
+                  <span>{isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}</span>
                 </div>
-              )}
+              </Button>
             </form>
 
-            {/* Guest Access Section */}
-            <div className="pt-4 border-t border-gray-200">
-              <div className="text-center mb-4">
-                <span className="text-sm text-gray-500 bg-white px-4">أو</span>
+            {/* Forgot Password */}
+            {isLogin && (
+              <div className="text-center">
+                <button className="text-sm text-sudan-blue hover:underline">
+                  نسيت كلمة المرور؟
+                </button>
               </div>
-              <Button 
-                onClick={() => setLocation("/dashboard")} 
-                variant="outline"
-                className="w-full py-3 text-base font-medium rounded-2xl border-2 border-gray-200 hover:border-teal-500 hover:text-teal-600 transition-all duration-300"
-              >
-                الدخول كزائر
-              </Button>
-            </div>
+            )}
 
-            {/* Footer */}
-            <div className="text-center text-xs text-gray-500 pt-4">
-              بتسجيل الدخول، أنت توافق على{" "}
-              <button className="text-teal-600 hover:underline">شروط الاستخدام</button>
-              {" • "}
-              <button className="text-teal-600 hover:underline">سياسة الخصوصية</button>
+            {/* Guest Access */}
+            <div className="text-center pt-4 border-t border-gray-200">
+              <button
+                onClick={() => setLocation("/dashboard")}
+                className="flex items-center justify-center space-x-2 space-x-reverse text-gray-600 hover:text-sudan-green transition-colors mx-auto"
+              >
+                <ArrowRight className="w-4 h-4" />
+                <span className="text-sm">الدخول كزائر</span>
+              </button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Footer */}
+        <div className="text-center mt-6 text-white/70 text-xs">
+          <p>بتسجيل الدخول، أنت توافق على</p>
+          <div className="flex justify-center space-x-4 space-x-reverse mt-1">
+            <button className="hover:text-white underline">شروط الاستخدام</button>
+            <span>•</span>
+            <button className="hover:text-white underline">سياسة الخصوصية</button>
+          </div>
+        </div>
       </div>
     </div>
   );
