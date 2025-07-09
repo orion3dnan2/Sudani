@@ -29,7 +29,7 @@ export default function UserMenu({ user }: UserMenuProps) {
       <Button
         onClick={() => setLocation("/login")}
         variant="outline"
-        className="border-white text-white hover:bg-white hover:text-sudan-red"
+        className="border-sudan-gold text-sudan-earth dark:text-sudan-sand hover:bg-sudan-sand dark:hover:bg-sudan-copper/20 hover:text-sudan-red"
       >
         تسجيل الدخول
       </Button>
@@ -44,7 +44,7 @@ export default function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="text-white hover:bg-white/10 space-x-2 space-x-reverse">
+        <Button variant="ghost" className="text-sudan-earth dark:text-sudan-sand hover:bg-sudan-sand/20 dark:hover:bg-sudan-copper/20 space-x-2 space-x-reverse border border-sudan-gold/30">
           <div className="flex items-center space-x-2 space-x-reverse">
             {user.avatar ? (
               <img 
@@ -53,14 +53,14 @@ export default function UserMenu({ user }: UserMenuProps) {
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4" />
+              <div className="w-8 h-8 bg-sudan-gold/20 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-sudan-earth dark:text-sudan-sand" />
               </div>
             )}
-            <span className="font-medium">
+            <span className="font-medium text-sudan-earth dark:text-sudan-sand">
               {isAdmin ? "المدير العام" : (user.type === "business" ? `${user.name} - صاحب عمل` : user.name)}
             </span>
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4 text-sudan-earth dark:text-sudan-sand" />
           </div>
         </Button>
       </DropdownMenuTrigger>
