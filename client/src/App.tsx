@@ -18,6 +18,7 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminDashboardNew from "@/pages/admin-dashboard-new";
 import StoreSettingsPage from "@/pages/store-settings";
+import FieldsGuidePage from "@/pages/fields-guide";
 
 function Router() {
   return (
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/admin-dashboard-new" component={AdminDashboardNew} />
       <Route path="/store-settings" component={StoreSettingsPage} />
+      <Route path="/fields-guide" component={FieldsGuidePage} />
       <Route component={NotFound} />
     </Switch>
   );

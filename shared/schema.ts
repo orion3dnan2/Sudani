@@ -92,8 +92,16 @@ export const insertProductSchema = createInsertSchema(products).pick({
   imageUrl: true,
   whatsappPhone: true,
 }).extend({
+  name: z.string().min(1, "اسم المنتج مطلوب"),
+  category: z.string().min(1, "فئة المنتج مطلوبة"),
   price: z.string().min(1, "السعر مطلوب").transform((val) => val.toString()),
-});
+}).refine(
+  (data) => data.whatsappPhone && data.whatsappPhone.length >= 8,
+  {
+    message: "رقم الواتساب مطلوب ويجب أن يكون على الأقل 8 أرقام",
+    path: ["whatsappPhone"],
+  }
+);
 
 export const insertServiceSchema = createInsertSchema(services).pick({
   name: true,
@@ -102,6 +110,10 @@ export const insertServiceSchema = createInsertSchema(services).pick({
   phone: true,
   address: true,
   imageUrl: true,
+}).extend({
+  name: z.string().min(1, "اسم الخدمة مطلوب"),
+  category: z.string().min(1, "فئة الخدمة مطلوبة"),
+  phone: z.string().min(8, "رقم الهاتف مطلوب ويجب أن يكون على الأقل 8 أرقام"),
 });
 
 export const insertJobSchema = createInsertSchema(jobs).pick({

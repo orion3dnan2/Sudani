@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowRight, Package, Save, X } from "lucide-react";
+import { ArrowRight, Package, Save, X, HelpCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -123,6 +123,14 @@ export default function AddProductPage() {
               <p className="text-gray-600">أضف منتجاً جديداً أو خدمة إلى متجرك</p>
             </div>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => setLocation("/fields-guide")}
+            className="flex items-center space-x-2 space-x-reverse border-blue-300 text-blue-600 hover:bg-blue-50"
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span>دليل الحقول</span>
+          </Button>
         </div>
 
         {/* Content Tabs */}
