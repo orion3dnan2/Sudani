@@ -70,9 +70,12 @@ export default function DashboardPage() {
       
       <div className="max-w-md mx-auto px-4 py-6">
         {/* Welcome Message */}
-        <div className="bg-gradient-to-r from-sudan-red to-sudan-green rounded-2xl p-6 mb-6 text-white">
-          <h2 className="text-xl font-bold mb-2">أهلاً وسهلاً بك</h2>
-          <p className="text-sm opacity-90">اكتشف الخدمات والمنتجات السودانية في الكويت</p>
+        <div className="sudan-heritage-bg rounded-2xl p-6 mb-6 text-white relative overflow-hidden">
+          <div className="traditional-pattern absolute inset-0 opacity-20"></div>
+          <div className="relative z-10">
+            <h2 className="text-xl font-bold mb-2">أهلاً وسهلاً بك في البيت السوداني</h2>
+            <p className="text-sm opacity-90">اكتشف الخدمات والمنتجات السودانية الأصيلة في الكويت</p>
+          </div>
         </div>
 
         {/* Main Navigation Cards */}
@@ -83,14 +86,14 @@ export default function DashboardPage() {
               <div
                 key={section.path}
                 onClick={() => setLocation(section.path)}
-                className={`card-hover bg-white rounded-2xl p-6 shadow-lg cursor-pointer border-2 border-transparent hover:border-${section.color} transition-all`}
+                className="sudanese-card rounded-2xl p-6 cursor-pointer hover:scale-105 transition-all duration-300 hover:border-sudan-copper hover:shadow-lg group"
               >
                 <div className="text-center">
-                  <div className={`w-16 h-16 ${section.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                    <Icon className={`h-8 w-8 text-${section.color}`} />
+                  <div className={`w-16 h-16 bg-gradient-to-br from-sudan-sand to-sudan-gold rounded-full flex items-center justify-center mx-auto mb-4 group-hover:from-sudan-gold group-hover:to-sudan-copper transition-all duration-300`}>
+                    <Icon className="h-8 w-8 text-sudan-red group-hover:text-white transition-colors duration-300" />
                   </div>
-                  <h3 className="font-bold text-gray-800 mb-2">{section.title}</h3>
-                  <p className="text-xs text-gray-600">{section.description}</p>
+                  <h3 className="font-bold text-sudan-black dark:text-sudan-sand mb-2">{section.title}</h3>
+                  <p className="text-xs text-sudan-earth dark:text-sudan-sand">{section.description}</p>
                 </div>
               </div>
             );

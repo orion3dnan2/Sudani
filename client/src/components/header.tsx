@@ -23,16 +23,17 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 transition-colors duration-300">
+    <header className="sudanese-card sticky top-0 z-50 transition-all duration-300 border-b-2 border-sudan-gold">
       <div className="max-w-6xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 space-x-reverse">
-            <div className="w-12 h-12 bg-gradient-to-r from-sudan-red to-sudan-green rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">🏠</span>
+            <div className="w-14 h-14 sudan-heritage-bg rounded-full flex items-center justify-center shadow-lg border-2 border-sudan-gold relative overflow-hidden">
+              <div className="traditional-pattern absolute inset-0 opacity-20"></div>
+              <span className="text-white font-bold text-xl relative z-10">🏠</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800 dark:text-white">البيت السوداني</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300">سوداني وخليك قدها 🇸🇩</p>
+              <h1 className="heritage-text text-2xl font-bold">البيت السوداني</h1>
+              <p className="text-sm text-sudan-earth dark:text-sudan-sand font-medium">سوداني وخليك قدها 🇸🇩</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 space-x-reverse">

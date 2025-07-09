@@ -51,6 +51,16 @@ export default {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
+        // Sudanese heritage colors
+        "sudan-red": "var(--sudan-red)",
+        "sudan-green": "var(--sudan-green)",
+        "sudan-yellow": "var(--sudan-yellow)",
+        "sudan-black": "var(--sudan-black)",
+        "sudan-gold": "var(--sudan-gold)",
+        "sudan-sand": "var(--sudan-sand)",
+        "sudan-earth": "var(--sudan-earth)",
+        "sudan-copper": "var(--sudan-copper)",
+        "kuwait-blue": "var(--kuwait-blue)",
         sidebar: {
           DEFAULT: "var(--sidebar-background)",
           foreground: "var(--sidebar-foreground)",

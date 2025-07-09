@@ -26,12 +26,21 @@
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
 
-  /* Sudanese flag colors */
-  --sudan-red: hsl(0, 100%, 50%);
-  --sudan-green: hsl(120, 100%, 25%);
-  --sudan-yellow: hsl(51, 100%, 50%);
-  --sudan-black: hsl(0, 0%, 0%);
+  /* Sudanese heritage colors */
+  --sudan-red: hsl(0, 85%, 45%);
+  --sudan-green: hsl(145, 70%, 30%);
+  --sudan-yellow: hsl(45, 95%, 55%);
+  --sudan-black: hsl(0, 0%, 15%);
+  --sudan-gold: hsl(42, 85%, 60%);
+  --sudan-sand: hsl(32, 40%, 85%);
+  --sudan-earth: hsl(25, 35%, 45%);
+  --sudan-copper: hsl(15, 60%, 50%);
   --kuwait-blue: hsl(214, 100%, 40%);
+  
+  /* Traditional pattern colors */
+  --pattern-light: hsl(32, 25%, 92%);
+  --pattern-medium: hsl(28, 20%, 75%);
+  --pattern-dark: hsl(25, 30%, 35%);
 }
 
 .dark {
@@ -63,8 +72,22 @@
   }
 
   body {
-    @apply font-arabic antialiased bg-gray-50 dark:bg-gray-900 text-foreground transition-colors duration-300;
+    @apply font-arabic antialiased text-foreground transition-colors duration-300;
     direction: rtl;
+    background: linear-gradient(135deg, 
+      var(--pattern-light) 0%, 
+      hsl(32, 20%, 96%) 25%, 
+      hsl(35, 15%, 94%) 50%,
+      var(--pattern-light) 100%);
+    min-height: 100vh;
+  }
+  
+  .dark body {
+    background: linear-gradient(135deg, 
+      hsl(240, 15%, 8%) 0%, 
+      hsl(235, 12%, 12%) 25%, 
+      hsl(230, 10%, 15%) 50%,
+      hsl(240, 15%, 8%) 100%);
   }
 
   html {
@@ -91,6 +114,56 @@
 
   .sudan-gradient {
     background: linear-gradient(135deg, var(--sudan-red) 0%, var(--sudan-green) 35%, var(--sudan-yellow) 70%, var(--sudan-black) 100%);
+  }
+  
+  .sudan-heritage-bg {
+    background: linear-gradient(45deg, 
+      var(--sudan-sand) 0%, 
+      var(--sudan-gold) 25%, 
+      var(--sudan-copper) 50%, 
+      var(--sudan-earth) 75%, 
+      var(--sudan-red) 100%);
+  }
+  
+  .traditional-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, var(--pattern-medium) 2px, transparent 2px),
+      radial-gradient(circle at 75% 75%, var(--pattern-dark) 1px, transparent 1px);
+    background-size: 40px 40px, 20px 20px;
+    background-position: 0 0, 20px 20px;
+  }
+  
+  .sudanese-card {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(250, 248, 245, 0.98) 100%);
+    border: 1px solid var(--sudan-gold);
+    box-shadow: 0 4px 20px rgba(184, 134, 11, 0.1);
+  }
+  
+  .dark .sudanese-card {
+    background: linear-gradient(135deg, 
+      rgba(30, 30, 30, 0.95) 0%, 
+      rgba(25, 25, 25, 0.98) 100%);
+    border: 1px solid var(--sudan-copper);
+    box-shadow: 0 4px 20px rgba(194, 65, 12, 0.2);
+  }
+  
+  .sudan-accent {
+    color: var(--sudan-red);
+  }
+  
+  .sudan-accent-bg {
+    background-color: var(--sudan-red);
+    color: white;
+  }
+  
+  .heritage-text {
+    background: linear-gradient(45deg, var(--sudan-red), var(--sudan-gold), var(--sudan-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
   }
 
   .card-hover {

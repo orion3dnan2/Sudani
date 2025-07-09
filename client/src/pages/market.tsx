@@ -105,7 +105,7 @@ export default function MarketPage() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen pb-20 bg-gray-50">
+      <div className="min-h-screen pb-20">
         <Header />
         <div className="max-w-md mx-auto px-4 py-6">
           <div className="flex items-center justify-center h-64">
@@ -123,7 +123,7 @@ export default function MarketPage() {
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen pb-20 bg-gray-50">
+      <div className="min-h-screen pb-20">
         <Header />
         <div className="max-w-md mx-auto px-4 py-6">
           <div className="bg-white rounded-2xl p-8 text-center shadow-lg">
@@ -148,7 +148,7 @@ export default function MarketPage() {
   }
 
   return (
-    <div className="min-h-screen pb-20 bg-gray-50">
+    <div className="min-h-screen pb-20">
       <Header />
       
       <div className="max-w-md mx-auto px-4 py-6">
@@ -157,21 +157,21 @@ export default function MarketPage() {
           <div className="flex items-center space-x-3 space-x-reverse">
             <button 
               onClick={() => setLocation("/dashboard")}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md"
+              className="w-10 h-10 sudanese-card rounded-full flex items-center justify-center"
             >
-              <ArrowRight className="h-5 w-5 text-gray-600" />
+              <ArrowRight className="h-5 w-5 text-sudan-red" />
             </button>
             <div>
-              <h2 className="text-xl font-bold text-gray-800">السوق السوداني</h2>
-              <p className="text-sm text-gray-600">منتجات أصيلة من السودان</p>
+              <h2 className="heritage-text text-xl font-bold">السوق السوداني</h2>
+              <p className="text-sm text-sudan-earth dark:text-sudan-sand">منتجات أصيلة من أرض الكنانة 🇸🇩</p>
             </div>
           </div>
           <div className="flex space-x-2 space-x-reverse">
-            <button className="w-10 h-10 bg-sudan-red rounded-full flex items-center justify-center shadow-md">
+            <button className="w-10 h-10 sudan-accent-bg rounded-full flex items-center justify-center shadow-md hover:bg-sudan-copper transition-colors">
               <Search className="h-5 w-5 text-white" />
             </button>
-            <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md">
-              <Filter className="h-5 w-5 text-gray-600" />
+            <button className="w-10 h-10 sudanese-card rounded-full flex items-center justify-center">
+              <Filter className="h-5 w-5 text-sudan-red" />
             </button>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function MarketPage() {
               placeholder="البحث عن منتج..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white rounded-2xl px-12 py-4 text-sm border-2 border-gray-100 focus:border-sudan-red focus:outline-none"
+              className="w-full sudanese-card rounded-2xl px-12 py-4 text-sm focus:border-sudan-gold focus:outline-none transition-all duration-300"
             />
           </div>
         </div>
@@ -197,10 +197,10 @@ export default function MarketPage() {
               <button
                 key={category.name}
                 onClick={() => setSelectedCategory(category.name)}
-                className={`flex-shrink-0 px-4 py-3 rounded-2xl text-sm whitespace-nowrap font-medium transition-all ${
+                className={`flex-shrink-0 px-4 py-3 rounded-2xl text-sm whitespace-nowrap font-medium transition-all duration-300 ${
                   selectedCategory === category.name
-                    ? "bg-sudan-red text-white shadow-lg"
-                    : "bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+                    ? "sudan-accent-bg text-white shadow-lg border border-sudan-gold"
+                    : "sudanese-card text-sudan-earth dark:text-sudan-sand hover:border-sudan-gold hover:bg-sudan-sand/20 dark:hover:bg-sudan-copper/10"
                 }`}
               >
                 <div className="flex items-center space-x-2 space-x-reverse">
@@ -230,7 +230,7 @@ export default function MarketPage() {
         {filteredProducts.length > 0 ? (
           <div className="space-y-4">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl overflow-hidden shadow-lg">
+              <div key={product.id} className="sudanese-card rounded-2xl overflow-hidden hover:scale-102 transition-all duration-300">
                 <div className="relative">
                   <img 
                     src={product.imageUrl || "/api/placeholder/400/200"} 
