@@ -305,6 +305,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin statistics endpoint
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      const products = await storage.getProducts();
+      const services = await storage.getServices();
+      const jobs = await storage.getJobs();
+      const announcements = await storage.getAnnouncements();
+      
+      const stats = {
+        totalUsers: users.length,
+        totalBusinesses: users.filter(u => u.userType === 'business').length,
+        totalErrors: 0, // Mock for now
+        totalListings: products.length + services.length + jobs.length + announcements.length,
+        usersByRole: {
+          admin: users.filter(u => u.userType === 'admin').length,
+          manager: users.filter(u => u.userType === 'manager').length,
+          business: users.filter(u => u.userType === 'business').length,
+          user: users.filter(u => u.userType === 'user').length,
+        },
+        monthlyGrowth: {} // Mock for now
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch statistics" });
+    }
+  });
+
+  // Admin logs endpoint
+  app.get("/api/admin/logs", async (req, res) => {
+    try {
+      // Mock system logs for now
+      const logs = [
+        {
+          id: 1,
+          timestamp: new Date().toISOString(),
+          level: 'error',
+          message: 'Database connection timeout',
+          userId: 1,
+          resolved: false
+        },
+        {
+          id: 2,
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          level: 'warning',
+          message: 'High memory usage detected',
+          resolved: true
+        }
+      ];
+      res.json(logs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
+
+  // Admin backup endpoints
+  app.get("/api/admin/backups", async (req, res) => {
+    try {
+      // Mock backup history for now
+      const backups = [
+        {
+          id: 1,
+          timestamp: new Date().toISOString(),
+          size: '245 MB',
+          type: 'full',
+          status: 'completed'
+        },
+        {
+          id: 2,
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          size: '180 MB',
+          type: 'full',
+          status: 'completed'
+        }
+      ];
+      res.json(backups);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch backups" });
+    }
+  });
+
+  app.post("/api/admin/backup", async (req, res) => {
+    try {
+      // Mock backup creation
+      const backup = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        size: '0 MB',
+        type: 'full',
+        status: 'in_progress'
+      };
+      res.status(201).json(backup);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create backup" });
+    }
+  });
+
+  app.put("/api/admin/logs/:id/resolve", async (req, res) => {
+    try {
+      // Mock log resolution
+      res.json({ message: "Log resolved successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to resolve log" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

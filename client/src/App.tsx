@@ -16,6 +16,7 @@ import AnnouncementsPage from "@/pages/announcements";
 import NotFound from "@/pages/not-found";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminDashboardNew from "@/pages/admin-dashboard-new";
 import StoreSettingsPage from "@/pages/store-settings";
 
 function Router() {
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/announcements" component={AnnouncementsPage} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/admin-dashboard-new" component={AdminDashboardNew} />
       <Route path="/store-settings" component={StoreSettingsPage} />
       <Route component={NotFound} />
     </Switch>

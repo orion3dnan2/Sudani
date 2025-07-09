@@ -81,6 +81,10 @@ export default function UserMenu({ user }: UserMenuProps) {
               <Shield className="ml-2 h-4 w-4 text-red-600 dark:text-red-400" />
               <span>لوحة تحكم المطوّر</span>
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation("/admin-dashboard-new")}>
+              <Shield className="ml-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span>لوحة التحكم المطورة</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setLocation("/settings")}>
               <Settings className="ml-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>إعدادات النظام</span>
