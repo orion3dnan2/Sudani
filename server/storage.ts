@@ -4,9 +4,11 @@ import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
+  getUsers(): Promise<User[]>;
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
   
   // Product methods
   getProducts(): Promise<Product[]>;
@@ -41,6 +43,10 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // User methods
+  async getUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
@@ -57,6 +63,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   // Product methods
@@ -175,6 +190,10 @@ class MemoryStorage implements IStorage {
   private nextId = 1;
 
   // User methods
+  async getUsers(): Promise<User[]> {
+    return this.users;
+  }
+
   async getUser(id: number): Promise<User | undefined> {
     return this.users.find(u => u.id === id);
   }
@@ -187,6 +206,14 @@ class MemoryStorage implements IStorage {
     const user = { ...insertUser, id: this.nextId++ } as User & { id: number };
     this.users.push(user);
     return user;
+  }
+
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const userIndex = this.users.findIndex(u => u.id === id);
+    if (userIndex === -1) return undefined;
+    
+    this.users[userIndex] = { ...this.users[userIndex], ...userData };
+    return this.users[userIndex];
   }
 
   // Product methods

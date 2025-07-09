@@ -1,10 +1,31 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProductSchema, insertServiceSchema, insertJobSchema, insertAnnouncementSchema, insertUserSchema } from "@shared/schema";
+import { insertProductSchema, insertServiceSchema, insertJobSchema, insertAnnouncementSchema, insertUserSchema, updateUserSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Users routes
+  app.get("/api/users", async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const user = await storage.getUser(parseInt(req.params.id));
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
   app.post("/api/users", async (req, res) => {
     try {
       const validatedData = insertUserSchema.parse(req.body);
@@ -31,6 +52,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ 
           error: "Failed to create user",
+          message: "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى."
+        });
+      }
+    }
+  });
+
+  app.put("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const validatedData = updateUserSchema.parse(req.body);
+      
+      // Check if username already exists (excluding current user)
+      if (validatedData.username) {
+        const existingUser = await storage.getUserByUsername(validatedData.username);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ 
+            error: "Username already exists",
+            message: "اسم المستخدم موجود بالفعل، يرجى اختيار اسم آخر"
+          });
+        }
+      }
+      
+      const updatedUser = await storage.updateUser(userId, validatedData);
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error: any) {
+      console.error("User update error:", error);
+      if (error.name === 'ZodError') {
+        res.status(400).json({ 
+          error: "Invalid user data", 
+          details: error.errors,
+          message: "تأكد من ملء جميع الحقول المطلوبة بشكل صحيح"
+        });
+      } else {
+        res.status(500).json({ 
+          error: "Failed to update user",
           message: "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى."
         });
       }

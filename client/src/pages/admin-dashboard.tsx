@@ -99,6 +99,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function AdminDashboardPage() {
   const [, setLocation] = useLocation();
@@ -160,70 +163,244 @@ export default function AdminDashboardPage() {
     setLocation("/admin-login");
   };
 
+  // Fetch users from database
+  const { data: users = [] } = useQuery({
+    queryKey: ["/api/users"],
+  });
+
+  // Edit Profile Modal Component
+  const EditProfileModal = ({ user, onClose }: { user: any; onClose: () => void }) => {
+    const [formData, setFormData] = useState({
+      fullName: user?.fullName || "",
+      username: user?.username || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      userType: user?.userType || "user",
+      password: ""
+    });
+
+    const updateUserMutation = useMutation({
+      mutationFn: async (userData: any) => {
+        // Don't send password if it's empty (user doesn't want to change it)
+        const dataToSend = { ...userData };
+        if (!dataToSend.password) {
+          delete dataToSend.password;
+        }
+        
+        return await apiRequest(`/api/users/${user.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(dataToSend),
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+        toast({
+          title: "تم تحديث الملف الشخصي بنجاح",
+          description: "تم حفظ التغييرات بنجاح",
+        });
+        onClose();
+      },
+      onError: (error: any) => {
+        toast({
+          title: "خطأ في التحديث",
+          description: error?.message || "حدث خطأ أثناء تحديث الملف الشخصي",
+          variant: "destructive",
+        });
+      }
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      updateUserMutation.mutate(formData);
+    };
+
+    const handleInputChange = (field: string, value: string) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    return (
+      <DialogContent className="max-w-md mx-auto">
+        <DialogHeader>
+          <DialogTitle className="text-center">تعديل الملف الشخصي</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="fullName">الاسم الكامل</Label>
+            <Input
+              id="fullName"
+              value={formData.fullName}
+              onChange={(e) => handleInputChange("fullName", e.target.value)}
+              placeholder="الاسم الكامل"
+              className="text-right"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username">اسم المستخدم</Label>
+            <Input
+              id="username"
+              value={formData.username}
+              onChange={(e) => handleInputChange("username", e.target.value)}
+              placeholder="اسم المستخدم"
+              className="text-right"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">البريد الإلكتروني</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              placeholder="البريد الإلكتروني"
+              className="text-right"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">رقم الهاتف</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              placeholder="رقم الهاتف"
+              className="text-right"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="userType">نوع المستخدم</Label>
+            <Select value={formData.userType} onValueChange={(value) => handleInputChange("userType", value)}>
+              <SelectTrigger className="text-right">
+                <SelectValue placeholder="اختر نوع المستخدم" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">مدير عام</SelectItem>
+                <SelectItem value="manager">مدير فرعي</SelectItem>
+                <SelectItem value="business">صاحب عمل</SelectItem>
+                <SelectItem value="user">مستخدم عادي</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">كلمة المرور الجديدة (اختياري)</Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleInputChange("password", e.target.value)}
+              placeholder="اتركه فارغاً إذا كنت لا تريد تغيير كلمة المرور"
+              className="text-right"
+            />
+          </div>
+
+          <div className="flex space-x-2 space-x-reverse pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={updateUserMutation.isPending}
+              className="flex-1"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={updateUserMutation.isPending}
+              className="flex-1"
+            >
+              {updateUserMutation.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    );
+  };
+
   // User Permissions Management Component
   const UserPermissionsManager = () => {
-    const [permissionUsers, setPermissionUsers] = useState([
-      { id: 1, username: "admin", fullName: "أحمد محمد", type: "developer", permissions: { view: true, edit: true, delete: true, add: true } },
-      { id: 2, username: "manager", fullName: "فاطمة علي", type: "manager", permissions: { view: true, edit: true, delete: false, add: true } },
-      { id: 3, username: "business_owner", fullName: "محمد الأمين", type: "business", permissions: { view: true, edit: false, delete: false, add: true } },
-    ]);
+    const [editingUser, setEditingUser] = useState<any>(null);
 
-    const updateUserPermissions = (userId: number, permission: string, value: boolean) => {
-      setPermissionUsers(users => 
-        users.map(user => 
-          user.id === userId 
-            ? { ...user, permissions: { ...user.permissions, [permission]: value }}
-            : user
-        )
-      );
-      toast({ title: "تم تحديث الصلاحيات بنجاح" });
+    const getUserTypeLabel = (userType: string) => {
+      switch (userType) {
+        case 'admin': return 'مدير عام';
+        case 'manager': return 'مدير فرعي';
+        case 'business': return 'صاحب عمل';
+        default: return 'مستخدم عادي';
+      }
+    };
+
+    const getUserTypeBadgeClass = (userType: string) => {
+      switch (userType) {
+        case 'admin': return 'bg-red-100 text-red-700';
+        case 'manager': return 'bg-blue-100 text-blue-700';
+        case 'business': return 'bg-green-100 text-green-700';
+        default: return 'bg-gray-100 text-gray-700';
+      }
     };
 
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 space-x-reverse">
-            <Key className="w-5 h-5 text-blue-600" />
-            <span>🔐 إدارة صلاحيات المستخدمين</span>
+            <Users className="w-5 h-5 text-blue-600" />
+            <span>إدارة المستخدمين والصلاحيات</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {permissionUsers.map((user) => (
-              <div key={user.id} className="p-4 border rounded-lg">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-medium">{user.fullName}</h3>
-                    <p className="text-sm text-gray-600">@{user.username}</p>
-                    <Badge className={
-                      user.type === 'developer' ? 'bg-red-100 text-red-700' :
-                      user.type === 'manager' ? 'bg-blue-100 text-blue-700' :
-                      'bg-green-100 text-green-700'
-                    }>
-                      {user.type === 'developer' ? 'مطور' : user.type === 'manager' ? 'مدير عام' : 'صاحب عمل'}
-                    </Badge>
+            {users.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p>لا توجد مستخدمين مسجلين بعد</p>
+              </div>
+            ) : (
+              users.map((user: any) => (
+                <div key={user.id} className="p-4 border rounded-lg bg-white shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 space-x-reverse mb-2">
+                        <h3 className="font-medium text-lg">{user.fullName}</h3>
+                        <Badge className={getUserTypeBadgeClass(user.userType)}>
+                          {getUserTypeLabel(user.userType)}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p><span className="font-medium">اسم المستخدم:</span> @{user.username}</p>
+                        {user.email && <p><span className="font-medium">البريد:</span> {user.email}</p>}
+                        {user.phone && <p><span className="font-medium">الهاتف:</span> {user.phone}</p>}
+                        <p><span className="font-medium">تاريخ التسجيل:</span> {new Date(user.createdAt).toLocaleDateString('ar-SA')}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingUser(user)}
+                            className="flex items-center space-x-1 space-x-reverse"
+                          >
+                            <Edit className="w-4 h-4" />
+                            <span>تعديل الملف</span>
+                          </Button>
+                        </DialogTrigger>
+                        {editingUser && (
+                          <EditProfileModal 
+                            user={editingUser} 
+                            onClose={() => setEditingUser(null)} 
+                          />
+                        )}
+                      </Dialog>
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
-                  {['view', 'edit', 'delete', 'add'].map((permission) => (
-                    <label key={permission} className="flex items-center space-x-2 space-x-reverse">
-                      <input
-                        type="checkbox"
-                        checked={user.permissions[permission]}
-                        onChange={(e) => updateUserPermissions(user.id, permission, e.target.checked)}
-                        disabled={user.type === 'developer'} // Developer permissions can't be changed
-                        className="rounded"
-                      />
-                      <span className="text-sm">
-                        {permission === 'view' ? 'عرض' :
-                         permission === 'edit' ? 'تعديل' :
-                         permission === 'delete' ? 'حذف' : 'إضافة'}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
