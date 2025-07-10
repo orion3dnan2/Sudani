@@ -18,6 +18,8 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminDashboardNew from "@/pages/admin-dashboard-new";
 import AdminDashboardEnhanced from "@/pages/admin-dashboard-enhanced";
+import AdminSuperDashboard from "@/pages/admin-super-dashboard";
+import AdminLoginEnhanced from "@/pages/admin-login-enhanced";
 import StoreSettingsPage from "@/pages/store-settings";
 import FieldsGuidePage from "@/pages/fields-guide";
 
@@ -35,9 +37,11 @@ function Router() {
       <Route path="/jobs" component={JobsPage} />
       <Route path="/announcements" component={AnnouncementsPage} />
       <Route path="/admin-login" component={AdminLogin} />
+      <Route path="/admin-login-enhanced" component={AdminLoginEnhanced} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/admin-dashboard-new" component={AdminDashboardNew} />
       <Route path="/admin-dashboard-enhanced" component={AdminDashboardEnhanced} />
+      <Route path="/admin-super-dashboard" component={AdminSuperDashboard} />
       <Route path="/store-settings" component={StoreSettingsPage} />
       <Route path="/fields-guide" component={FieldsGuidePage} />
       <Route component={NotFound} />

@@ -9,35 +9,38 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<void>;
   
   // Product methods
   getProducts(): Promise<Product[]>;
   getProductsByCategory(category: string): Promise<Product[]>;
   getProduct(id: number): Promise<Product | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined>;
+  deleteProduct(id: number): Promise<void>;
   
   // Service methods
   getServices(): Promise<Service[]>;
   getServicesByCategory(category: string): Promise<Service[]>;
   getService(id: number): Promise<Service | undefined>;
   createService(service: InsertService): Promise<Service>;
+  updateService(id: number, service: Partial<InsertService>): Promise<Service | undefined>;
+  deleteService(id: number): Promise<void>;
   
   // Job methods
   getJobs(): Promise<Job[]>;
   getJobsByType(type: string): Promise<Job[]>;
   getJob(id: number): Promise<Job | undefined>;
   createJob(job: InsertJob): Promise<Job>;
+  updateJob(id: number, job: Partial<InsertJob>): Promise<Job | undefined>;
+  deleteJob(id: number): Promise<void>;
   
   // Announcement methods
   getAnnouncements(): Promise<Announcement[]>;
   getAnnouncementsByCategory(category: string): Promise<Announcement[]>;
   getAnnouncement(id: number): Promise<Announcement | undefined>;
   createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
-  
-  // Delete methods (admin only)
-  deleteProduct(id: number): Promise<void>;
-  deleteService(id: number): Promise<void>;
-  deleteJob(id: number): Promise<void>;
+  updateAnnouncement(id: number, announcement: Partial<InsertAnnouncement>): Promise<Announcement | undefined>;
   deleteAnnouncement(id: number): Promise<void>;
 }
 
@@ -74,6 +77,10 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
   // Product methods
   async getProducts(): Promise<Product[]> {
     return await db.select().from(products).where(eq(products.isActive, true));
@@ -94,6 +101,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertProduct)
       .returning();
     return product;
+  }
+
+  async updateProduct(id: number, productData: Partial<InsertProduct>): Promise<Product | undefined> {
+    const [product] = await db
+      .update(products)
+      .set(productData)
+      .where(eq(products.id, id))
+      .returning();
+    return product || undefined;
   }
 
   // Service methods
@@ -118,6 +134,15 @@ export class DatabaseStorage implements IStorage {
     return service;
   }
 
+  async updateService(id: number, serviceData: Partial<InsertService>): Promise<Service | undefined> {
+    const [service] = await db
+      .update(services)
+      .set(serviceData)
+      .where(eq(services.id, id))
+      .returning();
+    return service || undefined;
+  }
+
   // Job methods
   async getJobs(): Promise<Job[]> {
     return await db.select().from(jobs).where(eq(jobs.isActive, true));
@@ -140,6 +165,15 @@ export class DatabaseStorage implements IStorage {
     return job;
   }
 
+  async updateJob(id: number, jobData: Partial<InsertJob>): Promise<Job | undefined> {
+    const [job] = await db
+      .update(jobs)
+      .set(jobData)
+      .where(eq(jobs.id, id))
+      .returning();
+    return job || undefined;
+  }
+
   // Announcement methods
   async getAnnouncements(): Promise<Announcement[]> {
     return await db.select().from(announcements).where(eq(announcements.isActive, true));
@@ -160,6 +194,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertAnnouncement)
       .returning();
     return announcement;
+  }
+
+  async updateAnnouncement(id: number, announcementData: Partial<InsertAnnouncement>): Promise<Announcement | undefined> {
+    const [announcement] = await db
+      .update(announcements)
+      .set(announcementData)
+      .where(eq(announcements.id, id))
+      .returning();
+    return announcement || undefined;
   }
 
   // Delete methods (admin only)
@@ -216,6 +259,10 @@ class MemoryStorage implements IStorage {
     return this.users[userIndex];
   }
 
+  async deleteUser(id: number): Promise<void> {
+    this.users = this.users.filter(u => u.id !== id);
+  }
+
   // Product methods
   async getProducts(): Promise<Product[]> {
     return this.products;
@@ -233,6 +280,14 @@ class MemoryStorage implements IStorage {
     const product = { ...insertProduct, id: this.nextId++ } as Product & { id: number };
     this.products.push(product);
     return product;
+  }
+
+  async updateProduct(id: number, productData: Partial<InsertProduct>): Promise<Product | undefined> {
+    const productIndex = this.products.findIndex(p => p.id === id);
+    if (productIndex === -1) return undefined;
+    
+    this.products[productIndex] = { ...this.products[productIndex], ...productData };
+    return this.products[productIndex];
   }
 
   // Service methods
@@ -254,6 +309,14 @@ class MemoryStorage implements IStorage {
     return service;
   }
 
+  async updateService(id: number, serviceData: Partial<InsertService>): Promise<Service | undefined> {
+    const serviceIndex = this.services.findIndex(s => s.id === id);
+    if (serviceIndex === -1) return undefined;
+    
+    this.services[serviceIndex] = { ...this.services[serviceIndex], ...serviceData };
+    return this.services[serviceIndex];
+  }
+
   // Job methods
   async getJobs(): Promise<Job[]> {
     return this.jobs;
@@ -273,6 +336,14 @@ class MemoryStorage implements IStorage {
     return job;
   }
 
+  async updateJob(id: number, jobData: Partial<InsertJob>): Promise<Job | undefined> {
+    const jobIndex = this.jobs.findIndex(j => j.id === id);
+    if (jobIndex === -1) return undefined;
+    
+    this.jobs[jobIndex] = { ...this.jobs[jobIndex], ...jobData };
+    return this.jobs[jobIndex];
+  }
+
   // Announcement methods
   async getAnnouncements(): Promise<Announcement[]> {
     return this.announcements;
@@ -290,6 +361,14 @@ class MemoryStorage implements IStorage {
     const announcement = { ...insertAnnouncement, id: this.nextId++ } as Announcement & { id: number };
     this.announcements.push(announcement);
     return announcement;
+  }
+
+  async updateAnnouncement(id: number, announcementData: Partial<InsertAnnouncement>): Promise<Announcement | undefined> {
+    const announcementIndex = this.announcements.findIndex(a => a.id === id);
+    if (announcementIndex === -1) return undefined;
+    
+    this.announcements[announcementIndex] = { ...this.announcements[announcementIndex], ...announcementData };
+    return this.announcements[announcementIndex];
   }
 
   // Delete methods (admin only)

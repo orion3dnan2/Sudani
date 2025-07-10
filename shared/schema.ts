@@ -9,7 +9,9 @@ export const users = pgTable("users", {
   fullName: text("full_name").notNull(),
   phone: text("phone"),
   email: text("email"),
-  userType: text("user_type").default("user"), // admin, manager, business, user
+  userType: text("user_type").default("user"), // admin, developer, manager, business, user
+  isActive: boolean("is_active").default(true),
+  lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -23,6 +25,7 @@ export const products = pgTable("products", {
   whatsappPhone: text("whatsapp_phone"),
   sellerId: integer("seller_id").references(() => users.id),
   isActive: boolean("is_active").default(true),
+  isApproved: boolean("is_approved").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -37,6 +40,7 @@ export const services = pgTable("services", {
   imageUrl: text("image_url"),
   ownerId: integer("owner_id").references(() => users.id),
   isActive: boolean("is_active").default(true),
+  isApproved: boolean("is_approved").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -49,6 +53,7 @@ export const jobs = pgTable("jobs", {
   type: text("type").notNull(), // full-time, part-time, remote
   salary: text("salary"),
   isActive: boolean("is_active").default(true),
+  isApproved: boolean("is_approved").default(false),
   posterId: integer("poster_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -62,7 +67,26 @@ export const announcements = pgTable("announcements", {
   phone: text("phone"),
   imageUrl: text("image_url"),
   isActive: boolean("is_active").default(true),
+  isApproved: boolean("is_approved").default(false),
   posterId: integer("poster_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const systemLogs = pgTable("system_logs", {
+  id: serial("id").primaryKey(),
+  level: text("level").notNull(), // error, warning, info
+  message: text("message").notNull(),
+  userId: integer("user_id").references(() => users.id),
+  action: text("action"),
+  resolved: boolean("resolved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const adminSessions = pgTable("admin_sessions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  sessionToken: text("session_token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -136,6 +160,18 @@ export const insertAnnouncementSchema = createInsertSchema(announcements).pick({
   price: z.string().optional().transform((val) => val || null),
 });
 
+export const insertSystemLogSchema = createInsertSchema(systemLogs).pick({
+  level: true,
+  message: true,
+  userId: true,
+  action: true,
+});
+
+export const loginSchema = z.object({
+  username: z.string().min(1, "اسم المستخدم مطلوب"),
+  password: z.string().min(1, "كلمة المرور مطلوبة"),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
@@ -146,3 +182,7 @@ export type InsertJob = z.infer<typeof insertJobSchema>;
 export type Job = typeof jobs.$inferSelect;
 export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
 export type Announcement = typeof announcements.$inferSelect;
+export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;
+export type SystemLog = typeof systemLogs.$inferSelect;
+export type AdminSession = typeof adminSessions.$inferSelect;
+export type LoginData = z.infer<typeof loginSchema>;

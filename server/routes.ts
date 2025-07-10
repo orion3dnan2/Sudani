@@ -1,9 +1,211 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProductSchema, insertServiceSchema, insertJobSchema, insertAnnouncementSchema, insertUserSchema, updateUserSchema } from "@shared/schema";
+import { insertProductSchema, insertServiceSchema, insertJobSchema, insertAnnouncementSchema, insertUserSchema, updateUserSchema, loginSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Admin authentication route
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const validatedData = loginSchema.parse(req.body);
+      const user = await storage.getUserByUsername(validatedData.username);
+      
+      if (!user || user.password !== validatedData.password) {
+        return res.status(401).json({ 
+          error: "Invalid credentials",
+          message: "اسم المستخدم أو كلمة المرور غير صحيحة"
+        });
+      }
+      
+      if (user.userType !== 'admin' && user.userType !== 'developer') {
+        return res.status(403).json({ 
+          error: "Access denied",
+          message: "غير مسموح لك بالوصول إلى لوحة الإدارة"
+        });
+      }
+      
+      // Update last login
+      await storage.updateUser(user.id, { lastLogin: new Date() });
+      
+      res.json({ 
+        user: {
+          id: user.id,
+          username: user.username,
+          fullName: user.fullName,
+          userType: user.userType
+        },
+        message: "تم تسجيل الدخول بنجاح"
+      });
+    } catch (error: any) {
+      console.error("Admin login error:", error);
+      res.status(400).json({ 
+        error: "Invalid request",
+        message: "حدث خطأ في تسجيل الدخول"
+      });
+    }
+  });
+
+  // Admin user management routes
+  app.put("/api/admin/users/:id/activate", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updatedUser = await storage.updateUser(userId, { isActive: true });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json({ message: "User activated successfully", user: updatedUser });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to activate user" });
+    }
+  });
+
+  app.put("/api/admin/users/:id/deactivate", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updatedUser = await storage.updateUser(userId, { isActive: false });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json({ message: "User deactivated successfully", user: updatedUser });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to deactivate user" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      await storage.deleteUser(userId);
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
+  // Admin content approval routes
+  app.put("/api/admin/products/:id/approve", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const updatedProduct = await storage.updateProduct(productId, { isApproved: true, isActive: true });
+      
+      if (!updatedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      res.json({ message: "Product approved successfully", product: updatedProduct });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve product" });
+    }
+  });
+
+  app.put("/api/admin/products/:id/reject", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const updatedProduct = await storage.updateProduct(productId, { isApproved: false, isActive: false });
+      
+      if (!updatedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      res.json({ message: "Product rejected successfully", product: updatedProduct });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject product" });
+    }
+  });
+
+  app.put("/api/admin/services/:id/approve", async (req, res) => {
+    try {
+      const serviceId = parseInt(req.params.id);
+      const updatedService = await storage.updateService(serviceId, { isApproved: true, isActive: true });
+      
+      if (!updatedService) {
+        return res.status(404).json({ error: "Service not found" });
+      }
+      
+      res.json({ message: "Service approved successfully", service: updatedService });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve service" });
+    }
+  });
+
+  app.put("/api/admin/services/:id/reject", async (req, res) => {
+    try {
+      const serviceId = parseInt(req.params.id);
+      const updatedService = await storage.updateService(serviceId, { isApproved: false, isActive: false });
+      
+      if (!updatedService) {
+        return res.status(404).json({ error: "Service not found" });
+      }
+      
+      res.json({ message: "Service rejected successfully", service: updatedService });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject service" });
+    }
+  });
+
+  app.put("/api/admin/jobs/:id/approve", async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const updatedJob = await storage.updateJob(jobId, { isApproved: true, isActive: true });
+      
+      if (!updatedJob) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+      
+      res.json({ message: "Job approved successfully", job: updatedJob });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve job" });
+    }
+  });
+
+  app.put("/api/admin/jobs/:id/reject", async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const updatedJob = await storage.updateJob(jobId, { isApproved: false, isActive: false });
+      
+      if (!updatedJob) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+      
+      res.json({ message: "Job rejected successfully", job: updatedJob });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject job" });
+    }
+  });
+
+  app.put("/api/admin/announcements/:id/approve", async (req, res) => {
+    try {
+      const announcementId = parseInt(req.params.id);
+      const updatedAnnouncement = await storage.updateAnnouncement(announcementId, { isApproved: true, isActive: true });
+      
+      if (!updatedAnnouncement) {
+        return res.status(404).json({ error: "Announcement not found" });
+      }
+      
+      res.json({ message: "Announcement approved successfully", announcement: updatedAnnouncement });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve announcement" });
+    }
+  });
+
+  app.put("/api/admin/announcements/:id/reject", async (req, res) => {
+    try {
+      const announcementId = parseInt(req.params.id);
+      const updatedAnnouncement = await storage.updateAnnouncement(announcementId, { isApproved: false, isActive: false });
+      
+      if (!updatedAnnouncement) {
+        return res.status(404).json({ error: "Announcement not found" });
+      }
+      
+      res.json({ message: "Announcement rejected successfully", announcement: updatedAnnouncement });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject announcement" });
+    }
+  });
   // Users routes
   app.get("/api/users", async (req, res) => {
     try {
